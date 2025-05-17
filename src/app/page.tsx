@@ -248,10 +248,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="bg-white text-purple-600 hover:bg-gray-100">Solicitar presupuesto</Button>
-                <Button variant="outline" className="border-white text-white hover:bg-white/10">
-                  Ver más información
-                </Button>
+                <Button className="bg-white text-purple-600 hover:bg-gray-100">Ver más información</Button>
               </div>
             </div>
           </div>

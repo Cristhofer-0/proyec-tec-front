@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { NavLink } from "@/components/custom/navlink"
 
 
 const Header: React.FC = () => {
@@ -41,9 +42,7 @@ const Header: React.FC = () => {
             <Link href="#" className="font-medium transition-colors hover:text-primary">
               Conciertos
             </Link>
-            <Link href="#" className="font-medium transition-colors hover:text-primary">
-              Corporativos
-            </Link>
+            <NavLink href="/solicitud-evento">Solicitud</NavLink>
             <Link href="#" className="font-medium transition-colors hover:text-primary">
               Contacto
             </Link>
