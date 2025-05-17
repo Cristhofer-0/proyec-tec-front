@@ -8,6 +8,13 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useUserStore } from "@/stores/userStore"
 
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+
+import { Checkbox } from "@/components/ui/checkbox";
+import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import Link from "next/link";
+
+
 // ICONOS
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { IoMailOutline } from "react-icons/io5";
@@ -29,147 +36,183 @@ export default function Login() {
         setEmailLleno((valorEmail || "").trim() !== "");
     }, [valorEmail]);
 
-const setUser = useUserStore((state) => state.setUser)
-async function verificarCorreo(data: LoginData): Promise<void> {
-    try {
-        const url = new URL("http://localhost:3000/usuarios/login");
+    const setUser = useUserStore((state) => state.setUser)
 
-        const response = await fetch(url.toString(), {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                email: data.email,
-                password: data.password
-            }),
-        });
+    async function verificarCorreo(data: LoginData): Promise<void> {
+        try {
+            const url = new URL("http://localhost:3000/usuarios/login");
 
-        const responseData = await response.json(); // ✅ LÉELO UNA SOLA VEZ
+            const response = await fetch(url.toString(), {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: data.email,
+                    password: data.password
+                }),
+            });
 
-        if (!response.ok || !responseData) {
-            throw new Error(responseData?.message || "Error desconocido al iniciar sesión");
+            const responseData = await response.json(); // ✅ LÉELO UNA SOLA VEZ
+
+            if (!response.ok || !responseData) {
+                throw new Error(responseData?.message || "Error desconocido al iniciar sesión");
+            }
+
+            // Guardar cookie básica (puedes reemplazar con JWT o HttpOnly cookie más adelante)
+            document.cookie = `loggedUser=true; path=/`;
+
+            localStorage.setItem("user", JSON.stringify(responseData));
+            setUser(responseData)
+            router.push("/");
+
+        } catch (error: unknown) {
+            console.error("Error:", error);
         }
-
-        // Guardar cookie básica (puedes reemplazar con JWT o HttpOnly cookie más adelante)
-        document.cookie = `loggedUser=true; path=/`;
-
-        localStorage.setItem("user", JSON.stringify(responseData));
-        setUser(responseData)
-        router.push("/");
-
-    } catch (error: unknown) {
-        console.error("Error:", error);
     }
-}
 
     //FUNCION PARA MOSTRAR/OCULTAR LA CONTRASEÑA
     function verContaseña() {
         setMostrarPassword(prev => !prev);
     }
 
-  
+
 
     return (
-        <div className="flex justify-center items-center bg-slate-100 h-full md:min-h-screen p-4">
-            <div className="grid justify-center max-w-md mx-auto">
+        <div className="min-h-screen flex items-center justify-center bg-[#f5f8fb]">
+            <Card className="border-none shadow-[0_0_20px_rgba(0,0,0,0.15)] w-[90%] max-w-xl sm:max-w-2xl bg-gray-100">
+                <form onSubmit={handleSubmit(verificarCorreo)} className="p-6">
+                    <CardHeader className="space-y-1 text-center">
+                        <CardTitle className="text-2xl font-bold">Iniciar sesión</CardTitle>
+                        <CardDescription>Ingresa tus datos para acceder a tu cuenta</CardDescription>
+                    </CardHeader>
 
-                <form onSubmit={handleSubmit(verificarCorreo)} className="bg-white rounded-2xl p-6 -mt-14 relative z-10 shadow-[0_2px_16px_-3px_rgba(6,81,237,0.3)]">
-                    <div className="mb-12">
-                        <h3 className="text-3xl font-bold text-blue-600">Iniciar sesión</h3>
-                    </div>
-
-                    {/* INPUT CORREO */}
-                    <div className="space-y-1">
-                        <div className="relative flex items-center">
-                            <input
-                                type="text"
-                                className={`w-full text-slate-800 text-sm border-b border-slate-300 focus:border-blue-600 px-2 py-3 pr-8 outline-none
-                                ${emailLleno ? 'opacity-100' : 'opacity-50'} transition-all duration-300 ease-in-out transform`}
-                                {...register("email", {
-                                    required: true,
-                                    pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i
-                                })}
-                                placeholder="ejemplo@ejemplo.com"
-                            />
-                            <IoMailOutline className="w-[24px] h-[24px] absolute right-1" />
-                        </div>
-                        <div className="min-h-[1.25rem] transition-all duration-300 ease-in-out transform">
-                            <div className="min-h-[1.25rem] transition-all duration-300 ease-in-out transform">
-                                <span
-                                    className={`block text-red-600 text-sm transition-all duration-300 ease-in-out transform ${errors.email
-                                        ? 'opacity-100 translate-y-0'
-                                        : 'opacity-0 -translate-y-1 pointer-events-none select-none'
-                                        }`}
-                                >
-                                    {errors.email?.type === "required" && "El correo electrónico no debe estar vacío"}
-                                    {errors.email?.type === "pattern" && "El correo electrónico no es válido"}
-                                </span>
+                    <CardContent className="space-y-6">
+                        {/* INPUT CORREO */}
+                        <div className="space-y-4">
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                                <Input
+                                    type="text"
+                                    placeholder="Correo electrónico"
+                                    className="pl-10"
+                                    {...register("email", {
+                                        required: true,
+                                        pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i,
+                                    })}
+                                />
                             </div>
-                        </div>
-                    </div>
-
-                    {/* INPUT CONTRASEÑA */}
-                    <div className="space-y-1">
-                        <div className="relative flex items-center">
-
-
-                            {emailLleno ? (<Input type={mostrarPassword ? "text" : "password"}
-                                {...register("password", {
-                                    required: true,
-                                    minLength: 6,
-                                    maxLength: 20,
-                                })} placeholder='Ingresar contraseña' className="w-full text-slate-800 text-sm border-b border-slate-300 px-2 py-3 pr-8 outline-none placeholder-red-500"
-                            />) : (
-                                <Input disabled type="password" placeholder="Ingrese su correo electronico primero" className="w-full text-red-800 text-sm border-b border-slate-300 px-2 py-3 pr-8 outline-none placeholder-red-500" />
-                            )}
-
-                            {mostrarPassword ? (
-                                <FaRegEye className="w-[24px] h-[24px] absolute right-1 cursor-pointer" onClick={verContaseña} />
-                            ) : (
-                                <FaRegEyeSlash className="w-[24px] h-[24px] absolute right-1 cursor-pointer" onClick={verContaseña} />
+                            {errors.email && (
+                                <p className="text-sm text-red-600">
+                                    {errors.email.type === "required" && "El correo electrónico no debe estar vacío"}
+                                    {errors.email.type === "pattern" && "El correo electrónico no es válido"}
+                                </p>
                             )}
                         </div>
-                        <div className="min-h-[1.25rem] transition-all duration-300 ease-in-out transform">
-                            <div className="min-h-[1.25rem] transition-all duration-300 ease-in-out transform">
-                                <span
-                                    className={`block text-red-600 text-sm transition-all duration-300 ease-in-out transform ${errors.password
-                                        ? 'opacity-100 translate-y-0'
-                                        : 'opacity-0 -translate-y-1 pointer-events-none select-none'
-                                        }`}
-                                >
-                                    {errors.password?.type === "required" && "La contraseña no debe estar vacía"}
-                                    {errors.password?.type === "minLength" && "La contraseña debe tener al menos 6 caracteres"}
-                                    {errors.password?.type === "maxLength" && "La contraseña no debe exceder los 20 caracteres"}
-                                </span>
-                            </div>
 
+                        {/* INPUT CONTRASEÑA */}
+                        <div className="space-y-4">
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                                <Input
+                                    type={mostrarPassword ? "text" : "password"}
+                                    placeholder={
+                                        emailLleno ? "Contraseña" : "Ingrese su correo electrónico primero"
+                                    }
+                                    disabled={!emailLleno}
+                                    className={`pl-10 ${!emailLleno ? "text-red-500 placeholder-red-500" : ""}`}
+                                    {...register("password", {
+                                        required: true,
+                                        minLength: 6,
+                                        maxLength: 20,
+                                    })}
+                                />
+                                {mostrarPassword ? (
+                                    <Eye className="absolute right-3 top-3 h-4 w-4 text-gray-400 cursor-pointer" onClick={verContaseña} />
+                                ) : (
+                                    <EyeOff className="absolute right-3 top-3 h-4 w-4 text-gray-400 cursor-pointer" onClick={verContaseña} />
+                                )}
+                            </div>
+                            {errors.password && (
+                                <p className="text-sm text-red-600">
+                                    {errors.password.type === "required" && "La contraseña no debe estar vacía"}
+                                    {errors.password.type === "minLength" && "La contraseña debe tener al menos 6 caracteres"}
+                                    {errors.password.type === "maxLength" && "La contraseña no debe exceder los 20 caracteres"}
+                                </p>
+                            )}
                         </div>
+
                         {/* RECORDAR Y OLVIDAR */}
-                        <div className="flex flex-wrap items-center justify-between gap-4">
-                            <div className="flex items-center">
-                                <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 shrink-0 text-blue-600 focus:ring-blue-500 border-slate-300 rounded" />
-                                <label htmlFor="remember-me" className="text-slate-800 ml-3 block text-sm">
+                        <div className="flex items-center justify-between mt-4">
+                            <div className="flex items-center space-x-2">
+                                <Checkbox id="remember" />
+                                <label
+                                    htmlFor="remember"
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
                                     Recuérdame
                                 </label>
                             </div>
-                            <div>
-                                <a href="javascript:void(0);" className="text-blue-600 text-sm font-medium hover:underline">
-                                    ¿Olvidaste la contraseña?
-                                </a>
+                            <Link href="/recuperar-password" className="text-sm font-medium text-purple-600 hover:underline">
+                                ¿Olvidaste tu contraseña?
+                            </Link>
+                        </div>
+
+                        <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
+                            Iniciar sesión
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t border-gray-200" />
                             </div>
                         </div>
-                    </div>
+                    </CardContent>
 
-                    <hr className="my-6 border-slate-300" />
-
-                    <div className="space-x-8 flex justify-center">
-                        <Button type='submit' variant="default" className="btn btn-primary text-blue-500 block bg-green-400 hover:bg-green-700">
-                            Iniciar sesión
-                        </Button>
-                    </div>
+                    <CardFooter className="flex flex-col space-y-6">
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t border-gray-200" />
+                            </div>
+                        </div>
+                        <div className="text-center text-sm">
+                            ¿No tienes una cuenta?{" "}
+                            <Link href="/registro" className="font-medium text-purple-600 hover:underline">
+                                Regístrate
+                            </Link>
+                        </div>
+                    </CardFooter>
                 </form>
+            </Card>
+
+            <div className="hidden md:block absolute top-1/4 left-20 w-24 h-24 bg-purple-200 rounded-full opacity-50" />
+            <div className="hidden md:block absolute bottom-1/4 right-20 w-32 h-32 bg-pink-200 rounded-full opacity-50" />
+            <div className="hidden md:block absolute top-1/3 right-40 w-16 h-16 bg-yellow-200 rounded-full opacity-50" />
+
+            {/* Background decorations */}
+            <div className="hidden md:block absolute top-20 right-10">
+                <div className="relative w-40 h-40">
+                    <Image
+                        src="/placeholder.svg?height=160&width=160"
+                        alt="Decoración"
+                        fill
+                        className="object-contain opacity-10"
+                    />
+                </div>
+            </div>
+            <div className="hidden md:block absolute bottom-10 left-10">
+                <div className="relative w-48 h-48">
+                    <Image
+                        src="/placeholder.svg?height=192&width=192"
+                        alt="Decoración"
+                        fill
+                        className="object-contain opacity-10"
+                    />
+                </div>
             </div>
         </div>
+
+
     );
 }
