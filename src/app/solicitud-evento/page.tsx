@@ -29,49 +29,60 @@ export default function FormularioCambioRol() {
     }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+  
 
-    // Validación básica
-    if (!formData.dni || !formData.nombre || !formData.email || !formData.telefono || !formData.razon) {
-      toast({
-        title: "Error",
-        description: "Por favor complete todos los campos requeridos.",
-        variant: "destructive",
-      })
-      setIsSubmitting(false)
-      return
-    }
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setIsSubmitting(true)
 
-    // Aquí iría la lógica para enviar los datos a un servidor
-    try {
-      // Simulación de envío
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      toast({
-        title: "Solicitud enviada",
-        description: "Su solicitud de cambio de rol ha sido enviada correctamente.",
-      })
-
-      // Resetear el formulario
-      setFormData({
-        dni: "",
-        nombre: "",
-        email: "",
-        telefono: "",
-        razon: "",
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Hubo un problema al enviar su solicitud. Intente nuevamente.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsSubmitting(false)
-    }
+  if (!formData.dni || !formData.nombre || !formData.email || !formData.telefono || !formData.razon) {
+    toast({
+      title: "Error",
+      description: "Por favor complete todos los campos requeridos.",
+      variant: "destructive",
+    })
+    setIsSubmitting(false)
+    return
   }
+
+  try {
+    const response = await fetch("http://localhost:3000/solicitud-evento", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    })
+
+    if (!response.ok) {
+      const data = await response.json()
+      throw new Error(data.message || "Error al enviar la solicitud")
+    }
+
+    toast({
+      title: "Solicitud enviada",
+      description: "Su solicitud de cambio de rol ha sido enviada correctamente.",
+    })
+
+    setFormData({
+      dni: "",
+      nombre: "",
+      email: "",
+      telefono: "",
+      razon: "",
+    })
+  } catch (error: any) {
+    toast({
+      title: "Error",
+      description: error?.message ?? "Hubo un problema al enviar su solicitud. Intente nuevamente.",
+      variant: "destructive",
+    })
+  } finally {
+    setIsSubmitting(false)
+  }
+}
+
+
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -155,7 +166,7 @@ export default function FormularioCambioRol() {
               />
             </div>
           </CardContent>
-
+          <br />
           <CardFooter>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? "Enviando..." : "Enviar solicitud"}
