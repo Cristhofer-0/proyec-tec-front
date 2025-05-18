@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link"
 import Image from "next/image"
+import Eventos from "./eventos";
 import {
   ChevronLeft,
   ChevronRight,
@@ -32,61 +33,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
    <main className="flex-1">
-        <section className="relative">
-          <div className="overflow-hidden">
-            <div className="flex transition-transform duration-500 ease-in-out">
-              <div className="relative min-w-full h-[500px]">
-                <Image
-                  src="/placeholder.svg?height=500&width=1920"
-                  alt="Festival de música"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-900/70 to-pink-600/50 flex items-center">
-                  <div className="container px-4 md:px-6">
-                    <div className="max-w-xl space-y-4">
-                      <Badge className="bg-yellow-500 hover:bg-yellow-600 text-black">Destacado</Badge>
-                      <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl text-white">
-                        Festival de Música Primavera 2025
-                      </h1>
-                      <p className="text-white/90 md:text-xl">
-                        Disfruta de los mejores artistas en un ambiente increíble. ¡No te lo pierdas!
-                      </p>
-                      <div className="flex flex-col sm:flex-row gap-4">
-                        <Button className="bg-purple-600 hover:bg-purple-700 text-white">Reservar ahora</Button>
-                        <Button variant="outline" className="border-white text-white hover:bg-white/10">
-                          Ver detalles
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full"
-          >
-            <ChevronLeft className="h-6 w-6" />
-            <span className="sr-only">Anterior</span>
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white rounded-full"
-          >
-            <ChevronRight className="h-6 w-6" />
-            <span className="sr-only">Siguiente</span>
-          </Button>
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            <Button variant="ghost" size="sm" className="h-2 w-2 rounded-full bg-white p-0" />
-            <Button variant="ghost" size="sm" className="h-2 w-2 rounded-full bg-white/50 p-0" />
-            <Button variant="ghost" size="sm" className="h-2 w-2 rounded-full bg-white/50 p-0" />
-          </div>
-        </section>
+        <Eventos eventId={7} />
 
         {/* Categorías */}
         <section className="py-12 bg-gradient-to-b from-white to-purple-50">
