@@ -47,23 +47,20 @@ export default function Login() {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include", // ⬅️ Muy importante para recibir cookies
                 body: JSON.stringify({
                     email: data.email,
                     password: data.password
                 }),
             });
 
-            const responseData = await response.json(); // ✅ LÉELO UNA SOLA VEZ
+            const responseData = await response.json();
 
             if (!response.ok || !responseData) {
                 throw new Error(responseData?.message || "Error desconocido al iniciar sesión");
             }
 
-            // Guardar cookie básica (puedes reemplazar con JWT o HttpOnly cookie más adelante)
-            document.cookie = `loggedUser=true; path=/`;
-
-            localStorage.setItem("user", JSON.stringify(responseData));
-            setUser(responseData)
+            setUser(responseData.user); // ✅ Solo guarda los datos del usuario
             router.push("/");
 
         } catch (error: unknown) {
@@ -75,8 +72,6 @@ export default function Login() {
     function verContaseña() {
         setMostrarPassword(prev => !prev);
     }
-
-
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#f5f8fb]">
