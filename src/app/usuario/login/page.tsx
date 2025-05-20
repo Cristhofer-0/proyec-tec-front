@@ -1,213 +1,248 @@
-"use client"
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import { useUserStore } from "@/stores/userStore"
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useUserStore } from "@/stores/userStore";
 
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
-
-// ICONOS
-import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import { IoMailOutline } from "react-icons/io5";
-
 interface LoginData {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 export default function Login() {
-    const { register, handleSubmit, watch, formState: { errors } } = useForm<LoginData>();
-    const router = useRouter();
-    const [mostrarPassword, setMostrarPassword] = useState(false);
-    const [emailLleno, setEmailLleno] = useState(false);
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<LoginData>();
+  const router = useRouter();
+  const [mostrarPassword, setMostrarPassword] = useState(false);
+  const [emailLleno, setEmailLleno] = useState(false);
+  const [loading, setLoading] = useState(true); // para mostrar mientras verifica la sesión
 
-    const valorEmail = watch("email");
+  const valorEmail = watch("email");
 
-    useEffect(() => {
-        setEmailLleno((valorEmail || "").trim() !== "");
-    }, [valorEmail]);
+  useEffect(() => {
+    setEmailLleno((valorEmail || "").trim() !== "");
+  }, [valorEmail]);
 
-    const setUser = useUserStore((state) => state.setUser)
+  const setUser = useUserStore((state) => state.setUser);
 
-    async function verificarCorreo(data: LoginData): Promise<void> {
-        try {
-            const url = new URL("http://localhost:3000/usuarios/login");
+  // Verificar sesión activa al montar el componente
+  useEffect(() => {
+    async function verificarAutenticacion() {
+      try {
+        const res = await fetch("http://localhost:3000/usuarios/validar", {
+          credentials: "include",
+        });
 
-            const response = await fetch(url.toString(), {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include", // ⬅️ Muy importante para recibir cookies
-                body: JSON.stringify({
-                    email: data.email,
-                    password: data.password
-                }),
-            });
-
-            const responseData = await response.json();
-
-            if (!response.ok || !responseData) {
-                throw new Error(responseData?.message || "Error desconocido al iniciar sesión");
-            }
-
-            setUser(responseData.user); // ✅ Solo guarda los datos del usuario
+        if (res.ok) {
+          const data = await res.json();
+          if (data?.user) {
+            setUser(data.user);
             router.push("/");
-
-        } catch (error: unknown) {
-            console.error("Error:", error);
+          } else {
+            setLoading(false);
+          }
+        } else {
+          setLoading(false);
         }
+      } catch (error) {
+        console.error("Error al verificar autenticación:", error);
+        setLoading(false);
+      }
     }
 
-    //FUNCION PARA MOSTRAR/OCULTAR LA CONTRASEÑA
-    function verContaseña() {
-        setMostrarPassword(prev => !prev);
-    }
+    verificarAutenticacion();
+  }, [router, setUser]);
 
+  async function verificarCorreo(data: LoginData): Promise<void> {
+    try {
+      const url = new URL("http://localhost:3000/usuarios/login");
+
+      const response = await fetch(url.toString(), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // ⬅️ Muy importante para recibir cookies
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+        }),
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok || !responseData) {
+        throw new Error(responseData?.message || "Error desconocido al iniciar sesión");
+      }
+
+      setUser(responseData.user); // ✅ Solo guarda los datos del usuario
+      router.push("/");
+    } catch (error: unknown) {
+      console.error("Error:", error);
+    }
+  }
+
+  // Función para mostrar/ocultar la contraseña
+  function verContaseña() {
+    setMostrarPassword((prev) => !prev);
+  }
+
+  if (loading) {
+    // Puedes poner un spinner o mensaje mientras verifica la sesión
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#f5f8fb]">
-            <Card className="border-none shadow-[0_0_20px_rgba(0,0,0,0.15)] w-[90%] max-w-xl sm:max-w-2xl bg-gray-100">
-                <form onSubmit={handleSubmit(verificarCorreo)} className="p-6">
-                    <CardHeader className="space-y-1 text-center">
-                        <CardTitle className="text-2xl font-bold">Iniciar sesión</CardTitle>
-                        <CardDescription>Ingresa tus datos para acceder a tu cuenta</CardDescription>
-                    </CardHeader>
-
-                    <CardContent className="space-y-6">
-                        {/* INPUT CORREO */}
-                        <div className="space-y-4">
-                            <div className="relative">
-                                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                <Input
-                                    type="text"
-                                    placeholder="Correo electrónico"
-                                    className="pl-10"
-                                    {...register("email", {
-                                        required: true,
-                                        pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i,
-                                    })}
-                                />
-                            </div>
-                            {errors.email && (
-                                <p className="text-sm text-red-600">
-                                    {errors.email.type === "required" && "El correo electrónico no debe estar vacío"}
-                                    {errors.email.type === "pattern" && "El correo electrónico no es válido"}
-                                </p>
-                            )}
-                        </div>
-
-                        {/* INPUT CONTRASEÑA */}
-                        <div className="space-y-4">
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                                <Input
-                                    type={mostrarPassword ? "text" : "password"}
-                                    placeholder={
-                                        emailLleno ? "Contraseña" : "Ingrese su correo electrónico primero"
-                                    }
-                                    disabled={!emailLleno}
-                                    className={`pl-10 ${!emailLleno ? "text-red-500 placeholder-red-500" : ""}`}
-                                    {...register("password", {
-                                        required: true,
-                                        minLength: 6,
-                                        maxLength: 20,
-                                    })}
-                                />
-                                {mostrarPassword ? (
-                                    <Eye className="absolute right-3 top-3 h-4 w-4 text-gray-400 cursor-pointer" onClick={verContaseña} />
-                                ) : (
-                                    <EyeOff className="absolute right-3 top-3 h-4 w-4 text-gray-400 cursor-pointer" onClick={verContaseña} />
-                                )}
-                            </div>
-                            {errors.password && (
-                                <p className="text-sm text-red-600">
-                                    {errors.password.type === "required" && "La contraseña no debe estar vacía"}
-                                    {errors.password.type === "minLength" && "La contraseña debe tener al menos 6 caracteres"}
-                                    {errors.password.type === "maxLength" && "La contraseña no debe exceder los 20 caracteres"}
-                                </p>
-                            )}
-                        </div>
-
-                        {/* RECORDAR Y OLVIDAR */}
-                        <div className="flex items-center justify-between mt-4">
-                            <div className="flex items-center space-x-2">
-                                <Checkbox id="remember" />
-                                <label
-                                    htmlFor="remember"
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                >
-                                    Recuérdame
-                                </label>
-                            </div>
-                            <Link href="/recuperar-password" className="text-sm font-medium text-purple-600 hover:underline">
-                                ¿Olvidaste tu contraseña?
-                            </Link>
-                        </div>
-
-                        <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
-                            Iniciar sesión
-                            <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <span className="w-full border-t border-gray-200" />
-                            </div>
-                        </div>
-                    </CardContent>
-
-                    <CardFooter className="flex flex-col space-y-6">
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <span className="w-full border-t border-gray-200" />
-                            </div>
-                        </div>
-                        <div className="text-center text-sm">
-                            ¿No tienes una cuenta?{" "}
-                            <Link href="/registro" className="font-medium text-purple-600 hover:underline">
-                                Regístrate
-                            </Link>
-                        </div>
-                    </CardFooter>
-                </form>
-            </Card>
-
-            <div className="hidden md:block absolute top-1/4 left-20 w-24 h-24 bg-purple-200 rounded-full opacity-50" />
-            <div className="hidden md:block absolute bottom-1/4 right-20 w-32 h-32 bg-pink-200 rounded-full opacity-50" />
-            <div className="hidden md:block absolute top-1/3 right-40 w-16 h-16 bg-yellow-200 rounded-full opacity-50" />
-
-            {/* Background decorations */}
-            <div className="hidden md:block absolute top-20 right-10">
-                <div className="relative w-40 h-40">
-                    <Image
-                        src="/placeholder.svg?height=160&width=160"
-                        alt="Decoración"
-                        fill
-                        className="object-contain opacity-10"
-                    />
-                </div>
-            </div>
-            <div className="hidden md:block absolute bottom-10 left-10">
-                <div className="relative w-48 h-48">
-                    <Image
-                        src="/placeholder.svg?height=192&width=192"
-                        alt="Decoración"
-                        fill
-                        className="object-contain opacity-10"
-                    />
-                </div>
-            </div>
-        </div>
-
-
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f8fb]">
+        <p className="text-gray-500">Verificando sesión...</p>
+      </div>
     );
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#f5f8fb]">
+      <Card className="border-none shadow-[0_0_20px_rgba(0,0,0,0.15)] w-[90%] max-w-xl sm:max-w-2xl bg-gray-100">
+        <form onSubmit={handleSubmit(verificarCorreo)} className="p-6">
+          <CardHeader className="space-y-1 text-center">
+            <CardTitle className="text-2xl font-bold">Iniciar sesión</CardTitle>
+            <CardDescription>Ingresa tus datos para acceder a tu cuenta</CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            {/* INPUT CORREO */}
+            <div className="space-y-4">
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Correo electrónico"
+                  className="pl-10"
+                  {...register("email", {
+                    required: true,
+                    pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i,
+                  })}
+                />
+              </div>
+              {errors.email && (
+                <p className="text-sm text-red-600">
+                  {errors.email.type === "required" && "El correo electrónico no debe estar vacío"}
+                  {errors.email.type === "pattern" && "El correo electrónico no es válido"}
+                </p>
+              )}
+            </div>
+
+            {/* INPUT CONTRASEÑA */}
+            <div className="space-y-4">
+              <div className="relative">
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  type={mostrarPassword ? "text" : "password"}
+                  placeholder={emailLleno ? "Contraseña" : "Ingrese su correo electrónico primero"}
+                  disabled={!emailLleno}
+                  className={`pl-10 ${!emailLleno ? "text-red-500 placeholder-red-500" : ""}`}
+                  {...register("password", {
+                    required: true,
+                    minLength: 6,
+                    maxLength: 20,
+                  })}
+                />
+                {mostrarPassword ? (
+                  <Eye className="absolute right-3 top-3 h-4 w-4 text-gray-400 cursor-pointer" onClick={verContaseña} />
+                ) : (
+                  <EyeOff className="absolute right-3 top-3 h-4 w-4 text-gray-400 cursor-pointer" onClick={verContaseña} />
+                )}
+              </div>
+              {errors.password && (
+                <p className="text-sm text-red-600">
+                  {errors.password.type === "required" && "La contraseña no debe estar vacía"}
+                  {errors.password.type === "minLength" && "La contraseña debe tener al menos 6 caracteres"}
+                  {errors.password.type === "maxLength" && "La contraseña no debe exceder los 20 caracteres"}
+                </p>
+              )}
+            </div>
+
+            {/* RECORDAR Y OLVIDAR */}
+            <div className="flex items-center justify-between mt-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox id="remember" />
+                <label
+                  htmlFor="remember"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Recuérdame
+                </label>
+              </div>
+              <Link href="/recuperar-password" className="text-sm font-medium text-purple-600 hover:underline">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
+
+            <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
+              Iniciar sesión
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-200" />
+              </div>
+            </div>
+          </CardContent>
+
+          <CardFooter className="flex flex-col space-y-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-200" />
+              </div>
+            </div>
+            <div className="text-center text-sm">
+              ¿No tienes una cuenta?{" "}
+              <Link href="/registro" className="font-medium text-purple-600 hover:underline">
+                Regístrate
+              </Link>
+            </div>
+          </CardFooter>
+        </form>
+      </Card>
+
+      <div className="hidden md:block absolute top-1/4 left-20 w-24 h-24 bg-purple-200 rounded-full opacity-50" />
+      <div className="hidden md:block absolute bottom-1/4 right-20 w-32 h-32 bg-pink-200 rounded-full opacity-50" />
+      <div className="hidden md:block absolute top-1/3 right-40 w-16 h-16 bg-yellow-200 rounded-full opacity-50" />
+
+      {/* Background decorations */}
+      <div className="hidden md:block absolute top-20 right-10">
+        <div className="relative w-40 h-40">
+          <Image
+            src="/placeholder.svg?height=160&width=160"
+            alt="Decoración"
+            fill
+            className="object-contain opacity-10"
+          />
+        </div>
+      </div>
+      <div className="hidden md:block absolute bottom-10 left-10">
+        <div className="relative w-48 h-48">
+          <Image
+            src="/placeholder.svg?height=192&width=192"
+            alt="Decoración"
+            fill
+            className="object-contain opacity-10"
+          />
+        </div>
+      </div>
+    </div>
+  );
 }
