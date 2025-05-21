@@ -81,7 +81,7 @@ export default async function Home() {
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-            {eventos.slice(3, 9).map((evento, index) => (
+            {eventos.slice(3, 6).map((evento, index) => (
               <Card key={index} className="overflow-hidden transition-all hover:shadow-lg">
                 <div className="relative h-48">
                   <Image
