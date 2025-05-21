@@ -28,22 +28,46 @@ export default function ProfilePage() {
   const [activeSection, setActiveSection] = useState("account")
   const router = useRouter()
 
+
+
   useEffect(() => {
-    const usuario = localStorage.getItem("user")
-    if (!usuario) {
-      router.push("/usuario/login")
+    async function validarSesion() {
+      try {
+        const res = await fetch("http://localhost:3000/usuarios/validar", {
+          method: "GET",
+          credentials: "include", // para enviar las cookies httpOnly automáticamente
+        });
+
+        if (!res.ok) {
+          router.push("/usuario/login");
+        }
+      } catch (error) {
+        console.error("Error validando sesión:", error);
+        router.push("/usuario/login");
+      }
     }
-  }, [router])
 
-  function cerrarSesion() {
-    // Borrar la cookie
-    document.cookie = "loggedUser=; path=/; max-age=0"
-    // Limpiar localStorage si guardas algo de sesión
-    localStorage.removeItem("user")
+    validarSesion();
+  }, [router]);
 
-    // Redirigir al login
-    router.push("/")
+
+  async function cerrarSesion() {
+    try {
+      // Llamar al endpoint logout para que borre la cookie httpOnly en backend
+      const response = await fetch("http://localhost:3000/usuarios/logout", {
+        method: "DELETE",
+        credentials: "include" // importante para enviar cookies
+      })
+      if (response.ok) {
+        router.push("/usuario/login")
+      } else {
+        console.error("Error al cerrar sesión")
+      }
+    } catch (error) {
+      console.error("Error en la llamada logout:", error)
+    }
   }
+
 
   return (
     <div className="min-h-screen bg-gray-50">
