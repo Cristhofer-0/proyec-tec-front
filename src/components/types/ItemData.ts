@@ -1,3 +1,5 @@
+import type { TicketData } from "./TicketData"
+
 export type ItemData = {
   id?: string
   organizerId: string
@@ -20,4 +22,5 @@ export type ItemData = {
   videoUrl?: string
   createdAt?: string
   updatedAt?: string
+   tickets?: TicketData[]  
 }

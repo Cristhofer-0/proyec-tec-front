@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 interface EventosProps {
   eventId: number;
@@ -68,7 +69,7 @@ useEffect(() => {
                 </p>
                 <div className="mt-4 flex flex-col sm:flex-row gap-4">
                   <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                    Ver detalles
+                    <Link href="/eventos">Ver detalles</Link>
                   </Button>
                   <Button
                     variant="outline"
