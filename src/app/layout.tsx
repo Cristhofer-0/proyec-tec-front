@@ -4,9 +4,8 @@ import "./globals.css";
 import Footer from "./utils/footer";
 import Header from "./utils/header";
 
-
 export const metadata: Metadata = {
-  title: "Joint With Us - Pagina",
+  title: "Joint With Us | Los mejores eventos de la comunidad",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico"
