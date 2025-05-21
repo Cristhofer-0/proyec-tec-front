@@ -56,7 +56,9 @@ const Header: React.FC = () => {
         </nav>
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" className="relative">
-            <ShoppingCart className="h-5 w-5" />
+            <Link href="/carrito">
+              <ShoppingCart className="h-5 w-5" />
+            </Link>
             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-purple-600 text-[10px] font-medium text-white">
               3
             </span>

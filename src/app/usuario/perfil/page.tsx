@@ -1,57 +1,76 @@
 "use client"
-
-import Link from "next/link"
 import Image from "next/image"
+import { useState } from "react"
 import {
   User,
   Settings,
   CreditCard,
-  Calendar,
-  Clock,
-  MapPin,
   ChevronRight,
   LogOut,
   Edit,
-  Bell,
   ShoppingBag,
-  Heart,
   HelpCircle,
-  ArrowLeft,
+  Package,
+  Mail,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useRouter } from "next/navigation"
 import { Separator } from "@/components/ui/separator"
 import { useEffect } from "react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function ProfilePage() {
+  const [activeSection, setActiveSection] = useState("account")
+  const router = useRouter()
+
+
 
   useEffect(() => {
-  const usuario = localStorage.getItem("user")
-  if (!usuario) {
-    router.push("/usuario/login")
-  }
-}, [])
+    async function validarSesion() {
+      try {
+        const res = await fetch("http://localhost:3000/usuarios/validar", {
+          method: "GET",
+          credentials: "include", // para enviar las cookies httpOnly automáticamente
+        });
 
-  const router = useRouter()  // Hook
-
-    function cerrarSesion() {
-        // Borrar la cookie
-        document.cookie = "loggedUser=; path=/; max-age=0";
-        // Limpiar localStorage si guardas algo de sesión
-        localStorage.removeItem("user");
-
-        // Redirigir al login
-        router.push("/");
+        if (!res.ok) {
+          router.push("/usuario/login");
+        }
+      } catch (error) {
+        console.error("Error validando sesión:", error);
+        router.push("/usuario/login");
+      }
     }
+
+    validarSesion();
+  }, [router]);
+
+
+  async function cerrarSesion() {
+    try {
+      // Llamar al endpoint logout para que borre la cookie httpOnly en backend
+      const response = await fetch("http://localhost:3000/usuarios/logout", {
+        method: "DELETE",
+        credentials: "include" // importante para enviar cookies
+      })
+      if (response.ok) {
+        router.push("/usuario/login")
+      } else {
+        console.error("Error al cerrar sesión")
+      }
+    } catch (error) {
+      console.error("Error en la llamada logout:", error)
+    }
+  }
+
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-
       <main className="container py-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {/* Sidebar */}
@@ -67,256 +86,347 @@ export default function ProfilePage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full mt-2 mb-6" size="sm">
-                  <Edit className="mr-2 h-4 w-4" />
-                  Editar perfil
-                </Button>
 
                 <nav className="space-y-1">
-                  <Link
-                    href="#"
-                    className="flex items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600"
+                  <button
+                    onClick={() => setActiveSection("account")}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
+                      activeSection === "account" ? "bg-purple-50 text-purple-600" : ""
+                    }`}
                   >
                     <div className="flex items-center">
-                      <User className="mr-3 h-5 w-5 text-gray-400" />
+                      <User
+                        className={`mr-3 h-5 w-5 ${activeSection === "account" ? "text-purple-600" : "text-gray-400"}`}
+                      />
                       <span>Mi cuenta</span>
                     </div>
                     <ChevronRight className="h-4 w-4" />
-                  </Link>
+                  </button>
 
-                  <Link
-                    href="#"
-                    className="flex items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600"
+                  <button
+                    onClick={() => setActiveSection("purchases")}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
+                      activeSection === "purchases" ? "bg-purple-50 text-purple-600" : ""
+                    }`}
                   >
                     <div className="flex items-center">
-                      <ShoppingBag className="mr-3 h-5 w-5 text-gray-400" />
+                      <ShoppingBag
+                        className={`mr-3 h-5 w-5 ${activeSection === "purchases" ? "text-purple-600" : "text-gray-400"}`}
+                      />
                       <span>Mis compras</span>
                     </div>
                     <ChevronRight className="h-4 w-4" />
-                  </Link>
+                  </button>
 
-                  <Link
-                    href="#"
-                    className="flex items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600"
+                  <button
+                    onClick={() => setActiveSection("payment")}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
+                      activeSection === "payment" ? "bg-purple-50 text-purple-600" : ""
+                    }`}
                   >
                     <div className="flex items-center">
-                      <Heart className="mr-3 h-5 w-5 text-gray-400" />
-                      <span>Favoritos</span>
-                    </div>
-                    <ChevronRight className="h-4 w-4" />
-                  </Link>
-
-                  <Link
-                    href="#"
-                    className="flex items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600"
-                  >
-                    <div className="flex items-center">
-                      <CreditCard className="mr-3 h-5 w-5 text-gray-400" />
+                      <CreditCard
+                        className={`mr-3 h-5 w-5 ${activeSection === "payment" ? "text-purple-600" : "text-gray-400"}`}
+                      />
                       <span>Métodos de pago</span>
                     </div>
                     <ChevronRight className="h-4 w-4" />
-                  </Link>
+                  </button>
 
-                  <Link
-                    href="#"
-                    className="flex items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600"
+                  <button
+                    onClick={() => setActiveSection("settings")}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
+                      activeSection === "settings" ? "bg-purple-50 text-purple-600" : ""
+                    }`}
                   >
                     <div className="flex items-center">
-                      <Settings className="mr-3 h-5 w-5 text-gray-400" />
+                      <Settings
+                        className={`mr-3 h-5 w-5 ${activeSection === "settings" ? "text-purple-600" : "text-gray-400"}`}
+                      />
                       <span>Configuración</span>
                     </div>
                     <ChevronRight className="h-4 w-4" />
-                  </Link>
+                  </button>
 
-                  <Link
-                    href="#"
-                    className="flex items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600"
+                  <button
+                    onClick={() => setActiveSection("help")}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
+                      activeSection === "help" ? "bg-purple-50 text-purple-600" : ""
+                    }`}
                   >
                     <div className="flex items-center">
-                      <HelpCircle className="mr-3 h-5 w-5 text-gray-400" />
+                      <HelpCircle
+                        className={`mr-3 h-5 w-5 ${activeSection === "help" ? "text-purple-600" : "text-gray-400"}`}
+                      />
                       <span>Ayuda</span>
                     </div>
                     <ChevronRight className="h-4 w-4" />
-                  </Link>
+                  </button>
 
                   <Separator className="my-2" />
-<button
-  onClick={cerrarSesion}
-  className="flex w-full items-center rounded-md px-3 py-2 text-red-600 hover:bg-red-50"
->
-  <LogOut className="mr-3 h-5 w-5" />
-  <span>Cerrar sesión</span>
-</button>
+                  <button
+                    onClick={cerrarSesion}
+                    className="flex w-full items-center rounded-md px-3 py-2 text-red-600 hover:bg-red-50"
+                  >
+                    <LogOut className="mr-3 h-5 w-5" />
+                    <span>Cerrar sesión</span>
+                  </button>
                 </nav>
               </CardContent>
             </Card>
           </div>
 
-          {/* Main Content */}
+          {/* Content Area */}
           <div className="md:col-span-2">
-            <Tabs defaultValue="proximos" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-6">
-                <TabsTrigger value="proximos">Próximos eventos</TabsTrigger>
-                <TabsTrigger value="historial">Historial</TabsTrigger>
-                <TabsTrigger value="favoritos">Favoritos</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="proximos">
-                <h2 className="text-2xl font-bold mb-4">Próximos eventos</h2>
-
-                <div className="space-y-4">
-                  {[1, 2].map((item) => (
-                    <Card key={item} className="overflow-hidden">
-                      <div className="flex flex-col md:flex-row">
-                        <div className="relative h-48 w-full md:h-auto md:w-48">
-                          <Image
-                            src="/placeholder.svg?height=200&width=200"
-                            alt={`Evento ${item}`}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <CardContent className="flex-1 p-6">
-                          <div className="flex flex-col md:flex-row md:items-start md:justify-between">
-                            <div>
-                              <h3 className="text-xl font-bold mb-2">Festival de Música Primavera 2025</h3>
-                              <div className="flex items-center text-gray-500 mb-1">
-                                <Calendar className="h-4 w-4 mr-2" />
-                                <span>15 de Junio, 2025</span>
-                              </div>
-                              <div className="flex items-center text-gray-500 mb-1">
-                                <Clock className="h-4 w-4 mr-2" />
-                                <span>20:00 - 23:00</span>
-                              </div>
-                              <div className="flex items-center text-gray-500 mb-4">
-                                <MapPin className="h-4 w-4 mr-2" />
-                                <span>Arena Central, Madrid</span>
-                              </div>
-                              <Badge className="bg-green-500 mb-4">Confirmado</Badge>
-                            </div>
-                            <div className="mt-4 md:mt-0 flex flex-col items-start md:items-end">
-                              <div className="text-lg font-bold text-purple-600 mb-2">€45.00</div>
-                              <div className="text-sm text-gray-500 mb-4">2 entradas</div>
-                              <div className="flex gap-2">
-                                <Button variant="outline" size="sm">
-                                  Ver detalles
-                                </Button>
-                                <Button className="bg-purple-600 hover:bg-purple-700" size="sm">
-                                  Descargar entradas
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
+            {activeSection === "account" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Mi cuenta</CardTitle>
+                  <CardDescription>Gestiona tu información personal y preferencias</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex flex-col md:flex-row gap-6">
+                    <div className="flex-1 space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Nombre completo</Label>
+                        <Input id="name" defaultValue="María García" />
                       </div>
-                    </Card>
-                  ))}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="historial">
-                <h2 className="text-2xl font-bold mb-4">Historial de eventos</h2>
-
-                <div className="space-y-4">
-                  {[1, 2, 3].map((item) => (
-                    <Card key={item} className="overflow-hidden">
-                      <div className="flex flex-col md:flex-row">
-                        <div className="relative h-48 w-full md:h-auto md:w-48">
-                          <Image
-                            src="/placeholder.svg?height=200&width=200"
-                            alt={`Evento ${item}`}
-                            fill
-                            className="object-cover"
-                          />
-                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                            <Badge className="bg-gray-500">Finalizado</Badge>
-                          </div>
-                        </div>
-                        <CardContent className="flex-1 p-6">
-                          <div className="flex flex-col md:flex-row md:items-start md:justify-between">
-                            <div>
-                              <h3 className="text-xl font-bold mb-2">Concierto de Rock Alternativo</h3>
-                              <div className="flex items-center text-gray-500 mb-1">
-                                <Calendar className="h-4 w-4 mr-2" />
-                                <span>10 de Marzo, 2025</span>
-                              </div>
-                              <div className="flex items-center text-gray-500 mb-1">
-                                <Clock className="h-4 w-4 mr-2" />
-                                <span>19:00 - 22:00</span>
-                              </div>
-                              <div className="flex items-center text-gray-500 mb-4">
-                                <MapPin className="h-4 w-4 mr-2" />
-                                <span>Sala Apolo, Barcelona</span>
-                              </div>
-                            </div>
-                            <div className="mt-4 md:mt-0 flex flex-col items-start md:items-end">
-                              <div className="text-lg font-bold text-gray-600 mb-2">€35.00</div>
-                              <div className="text-sm text-gray-500 mb-4">1 entrada</div>
-                              <div className="flex gap-2">
-                                <Button variant="outline" size="sm">
-                                  Ver detalles
-                                </Button>
-                                <Button variant="outline" size="sm">
-                                  Valorar evento
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Correo electrónico</Label>
+                        <Input id="email" defaultValue="maria.garcia@ejemplo.com" />
                       </div>
-                    </Card>
-                  ))}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="favoritos">
-                <h2 className="text-2xl font-bold mb-4">Eventos favoritos</h2>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[1, 2, 3, 4].map((item) => (
-                    <Card key={item} className="overflow-hidden">
-                      <div className="relative h-48">
-                        <Image
-                          src="/placeholder.svg?height=200&width=400"
-                          alt={`Evento ${item}`}
-                          fill
-                          className="object-cover"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="absolute top-2 right-2 bg-white/80 hover:bg-white text-red-500 rounded-full"
-                        >
-                          <Heart className="h-5 w-5 fill-current" />
-                        </Button>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Teléfono</Label>
+                        <Input id="phone" defaultValue="+34 612 345 678" />
                       </div>
-                      <CardContent className="p-4">
-                        <h3 className="text-lg font-bold mb-2">Festival de Jazz</h3>
-                        <div className="flex items-center text-gray-500 mb-1 text-sm">
-                          <Calendar className="h-3 w-3 mr-1" />
-                          <span>22 de Julio, 2025</span>
-                        </div>
-                        <div className="flex items-center text-gray-500 mb-1 text-sm">
-                          <MapPin className="h-3 w-3 mr-1" />
-                          <span>Parque Central, Valencia</span>
-                        </div>
-                        <div className="flex items-center justify-between mt-3">
-                          <div className="text-lg font-bold text-purple-600">€55.00</div>
-                          <Button className="bg-purple-600 hover:bg-purple-700" size="sm">
-                            Ver detalles
+                    </div>
+                    <div className="flex-1 space-y-4">
+                      <div className="space-y-2">
+                        <Label>Foto de perfil</Label>
+                        <div className="flex flex-col items-center gap-4">
+                          <Avatar className="h-24 w-24">
+                            <AvatarImage src="/placeholder.svg?height=96&width=96" alt="Avatar" />
+                            <AvatarFallback>MG</AvatarFallback>
+                          </Avatar>
+                          <Button variant="outline" size="sm">
+                            Cambiar foto
                           </Button>
                         </div>
-                      </CardContent>
-                    </Card>
+                      </div>
+                    </div>
+                  </div>
+                  <Separator />
+                  <div className="flex justify-end">
+                    <Button>Guardar cambios</Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {activeSection === "purchases" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Mis compras</CardTitle>
+                  <CardDescription>Historial de tus compras recientes</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {[1, 2, 3].map((item) => (
+                    <div key={item} className="mb-4 border rounded-lg p-4">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="font-medium">Pedido #{Math.floor(Math.random() * 10000)}</h3>
+                          <p className="text-sm text-gray-500">Realizado el {new Date().toLocaleDateString()}</p>
+                        </div>
+                        <Badge variant={item === 1 ? "default" : "outline"}>
+                          {item === 1 ? "En camino" : "Entregado"}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-4 mt-4">
+                        <div className="h-16 w-16 bg-gray-100 rounded-md flex items-center justify-center">
+                          <Package className="h-8 w-8 text-gray-400" />
+                        </div>
+                        <div>
+                          <p className="font-medium">Producto {item}</p>
+                          <p className="text-sm text-gray-500">€{(Math.random() * 100).toFixed(2)}</p>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex justify-end">
+                        <Button variant="outline" size="sm">
+                          Ver detalles
+                        </Button>
+                      </div>
+                    </div>
                   ))}
-                </div>
-              </TabsContent>
-            </Tabs>
+                </CardContent>
+              </Card>
+            )}
+
+            {activeSection === "payment" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Métodos de pago</CardTitle>
+                  <CardDescription>Gestiona tus tarjetas y métodos de pago</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="border rounded-lg p-4 relative">
+                    <div className="flex items-center gap-4">
+                      <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <CreditCard className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium">Visa terminada en 4242</p>
+                        <p className="text-sm text-gray-500">Expira: 12/25</p>
+                      </div>
+                    </div>
+                    <Badge className="absolute top-4 right-4">Predeterminada</Badge>
+                  </div>
+
+                  <div className="border rounded-lg p-4">
+                    <div className="flex items-center gap-4">
+                      <div className="h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center">
+                        <CreditCard className="h-5 w-5 text-purple-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium">Mastercard terminada en 8888</p>
+                        <p className="text-sm text-gray-500">Expira: 09/26</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Button className="w-full" variant="outline">
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Añadir nuevo método de pago
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {activeSection === "settings" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Configuración</CardTitle>
+                  <CardDescription>Gestiona tus preferencias y configuración de la cuenta</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-medium">Notificaciones</h3>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <p className="text-sm font-medium">Correos electrónicos de marketing</p>
+                        <p className="text-xs text-gray-500">Recibe ofertas y promociones especiales</p>
+                      </div>
+                      <div>
+                        <Label htmlFor="marketing" className="sr-only">
+                          Correos electrónicos de marketing
+                        </Label>
+                        <input
+                          type="checkbox"
+                          id="marketing"
+                          className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <p className="text-sm font-medium">Actualizaciones de pedidos</p>
+                        <p className="text-xs text-gray-500">Recibe notificaciones sobre tus pedidos</p>
+                      </div>
+                      <div>
+                        <Label htmlFor="orders" className="sr-only">
+                          Actualizaciones de pedidos
+                        </Label>
+                        <input
+                          type="checkbox"
+                          id="orders"
+                          defaultChecked
+                          className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-medium">Seguridad</h3>
+                    <Button variant="outline" size="sm">
+                      Cambiar contraseña
+                    </Button>
+                    <Button variant="outline" size="sm" className="ml-2">
+                      Activar autenticación de dos factores
+                    </Button>
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-medium text-red-600">Zona de peligro</h3>
+                    <Button variant="destructive" size="sm">
+                      Eliminar cuenta
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {activeSection === "help" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Centro de ayuda</CardTitle>
+                  <CardDescription>Encuentra respuestas a tus preguntas</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Preguntas frecuentes</h3>
+
+                    <div className="space-y-4">
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium mb-2">¿Cómo puedo cambiar mi dirección de envío?</h4>
+                        <p className="text-sm text-gray-600">
+                          Puedes actualizar tu dirección de envío en la sección &quot;Mi cuenta&quot; &gt;
+                          &quot;Direcciones&quot;. Allí podrás añadir, editar o eliminar tus direcciones.
+                        </p>
+                      </div>
+
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium mb-2">¿Cuánto tiempo tarda en llegar mi pedido?</h4>
+                        <p className="text-sm text-gray-600">
+                          El tiempo de entrega depende de tu ubicación. Normalmente, los pedidos se entregan en 2-5 días
+                          laborables. Puedes consultar el estado de tu pedido en la sección &quot;Mis compras&quot;.
+                        </p>
+                      </div>
+
+                      <div className="border rounded-lg p-4">
+                        <h4 className="font-medium mb-2">¿Cómo puedo devolver un producto?</h4>
+                        <p className="text-sm text-gray-600">
+                          Para devolver un producto, ve a &quot;Mis compras&quot;, selecciona el pedido y haz clic en
+                          &quot;Solicitar devolución&quot;. Tienes 30 días desde la fecha de entrega para realizar
+                          devoluciones.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Contacto</h3>
+                    <p className="text-sm text-gray-600">
+                      ¿No encuentras lo que buscas? Ponte en contacto con nuestro equipo de soporte.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <Button variant="outline">
+                        <Mail className="mr-2 h-4 w-4" />
+                        Enviar correo
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </main>
-
     </div>
   )
 }
-
