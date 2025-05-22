@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft, Calendar, Clock, MapPin, User, Ticket, Share2, Heart } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, MapPin, User, Ticket, Share2, Heart, Play } from "lucide-react"
 import { fetchEventoById } from "@/services/eventos"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -15,6 +15,10 @@ import { useParams } from "next/navigation"
 import type { TicketData } from "@/components/types/TicketData"
 import { fetchTicketsByEventoId } from "@/services/eventos"
 import { MapView } from "@/components/principales/map-view"
+import { getYoutubeId } from "@/components/types/Video"
+import { ShareButton } from "@/components/principales/ShareEvent"
+import React from "react"
+
 
 
 export default function EventoDetalle() {
@@ -24,6 +28,10 @@ export default function EventoDetalle() {
   const [tickets, setTickets] = useState<TicketData[]>([]);
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [cantidades, setCantidades] = React.useState(() =>
+    tickets ? tickets.map(() => 0) : []
+  );
+  // Cargar el evento y los tickets
   useEffect(() => {
     async function loadData() {
       if (!id) return;
@@ -44,6 +52,36 @@ export default function EventoDetalle() {
     loadData();
   }, [id]);
 
+  // Cargar incrementador y decrementador
+  useEffect(() => {
+    if (tickets && tickets.length > 0) {
+      setCantidades(tickets.map(() => 0));
+    } else {
+      setCantidades([]);
+    }
+  }, [tickets]);
+
+  const incrementar = (index: number) => {
+    const newCantidades = [...cantidades];
+    if (newCantidades[index] < tickets[index].stockDisponible) {
+      newCantidades[index] += 1;
+      setCantidades(newCantidades);
+    }
+  };
+
+  const decrementar = (index: number) => {
+    const newCantidades = [...cantidades];
+    if (newCantidades[index] > 0) {
+      newCantidades[index] -= 1;
+      setCantidades(newCantidades);
+    }
+  };
+
+  const totalSeleccionado = cantidades.reduce((acc, val) => acc + val, 0);
+  const totalPrecio = cantidades.reduce(
+    (acc, cantidad, idx) => acc + cantidad * tickets[idx].precio,
+    0
+  );
 
 
   const ticket = tickets.length > 0 ? tickets[0] : null;
@@ -93,7 +131,7 @@ export default function EventoDetalle() {
             </Link>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2 drop-shadow-md">{evento.titulo}</h1>
             {Array.isArray(evento.categorias) && evento.categorias.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-2 mb-8">
                 {evento.categorias.map((categoria, index) => (
                   <Badge key={index} className="bg-purple-600 hover:bg-purple-700 text-white border-none px-3 py-1">
                     {categoria}
@@ -117,7 +155,16 @@ export default function EventoDetalle() {
                     {evento.descripcion ||
                       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum. Cras porttitor metus in enim tincidunt, vel feugiat nunc commodo. Nullam auctor, justo vitae tincidunt ultrices, nisi nulla hendrerit magna, vel tincidunt felis nisi a lectus."}
                   </p>
-
+                  <div className="relative w-full pt-[56.25%] rounded-xl overflow-hidden mb-6">
+                    <iframe
+                      className="absolute top-0 left-0 w-full h-full"
+                      src={`https://www.youtube.com/embed/${getYoutubeId(evento.videoUrl || "")}`}
+                      title="Video de YouTube"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
                   <h3 className="text-xl font-bold mt-8 mb-4">Detalles del evento</h3>
                   <div className="space-y-4">
                     <div className="flex items-start">
@@ -147,20 +194,13 @@ export default function EventoDetalle() {
                         <p className="text-gray-600">{evento.direccion || "Ubicación no disponible"}</p>
                       </div>
                     </div>
-
-                    <div className="flex items-start">
-                      <User className="w-5 h-5 mr-3 text-purple-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="font-medium">Organizador</p>
-                      </div>
-                    </div>
                   </div>
                 </div>
 
                 {/* Mapa */}
-<div className="mt-8">
-  <MapView item={evento} />
-</div>
+                <div className="mt-8">
+                  <MapView item={evento} />
+                </div>
 
               </CardContent>
             </Card>
@@ -172,32 +212,78 @@ export default function EventoDetalle() {
               <Card className="bg-white shadow-lg border-none rounded-xl overflow-hidden mb-6">
                 <CardContent className="p-6">
                   <h3 className="text-xl font-bold mb-4">Información de entradas</h3>
-                  <div className="space-y-4 mb-6">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Precio:</span>
-                      <span className="font-bold text-lg">
-                        S/. {ticket ? ticket.precio : "Entrada no creada"}
-                      </span>
+
+                  {tickets && tickets.length > 0 ? (
+                    <div className="space-y-6">
+                      {tickets.map((ticket, index) => (
+                        <div key={index} className="p-4 border border-gray-200 rounded-lg">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="font-medium">{ticket.tipo || "General"}</span>
+                            <span className="font-bold text-lg">S/. {ticket.precio}</span>
+                          </div>
+                          <div className="text-sm text-green-600 mb-3">
+                            {ticket.stockDisponible > 0
+                              ? `${ticket.stockDisponible} disponibles`
+                              : "Agotado"}
+                          </div>
+
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-gray-600">Cantidad:</span>
+                            <div className="flex items-center">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8"
+                                disabled={cantidades[index] <= 0}
+                                onClick={() => decrementar(index)}
+                              >
+                                <span className="text-lg">-</span>
+                              </Button>
+                              <span className="mx-3 font-medium">{cantidades[index]}</span>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8"
+                                disabled={cantidades[index] >= ticket.stockDisponible}
+                                onClick={() => incrementar(index)}
+                              >
+                                <span className="text-lg">+</span>
+                              </Button>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-between items-center text-sm">
+                            <span>Subtotal:</span>
+                            <span className="font-medium">
+                              S/. {(ticket.precio * cantidades[index]).toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+
+                      <div className="mt-4 pt-4 border-t border-gray-200">
+                        <div className="flex justify-between items-center mb-4">
+                          <span className="font-medium">Total:</span>
+                          <span className="font-bold text-lg">S/. {totalPrecio.toFixed(2)}</span>
+                        </div>
+
+                        <Button
+                          className="w-full bg-purple-600 hover:bg-purple-700 mb-3"
+                          disabled={totalSeleccionado === 0}
+                        >
+                          <Ticket className="w-4 h-4 mr-2" />
+                          {totalSeleccionado > 0 ? "Comprar" : "Selecciona entradas"}
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Disponibilidad:</span>
-                      <span className="font-medium text-green-600">
-                        {ticket ? (ticket.stockDisponible > 0 ? `${ticket.stockDisponible} disponibles` : "Agotado") : "N/A"}
-                      </span>
+                  ) : (
+                    <div className="text-center py-4">
+                      <p className="text-gray-500">No hay entradas disponibles</p>
                     </div>
-                  </div>
-                  <Separator className="my-4" />
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700 mb-3">
-                    <Ticket className="w-4 h-4 mr-2" />
-                    Reservar entrada
-                  </Button>
+                  )}
+
                   <div className="flex gap-2 mt-4">
-                    <Button variant="outline" size="icon" className="flex-1">
-                      <Share2 className="w-4 h-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="flex-1">
-                      <Heart className="w-4 h-4" />
-                    </Button>
+                    <ShareButton />
                   </div>
                 </CardContent>
               </Card>
