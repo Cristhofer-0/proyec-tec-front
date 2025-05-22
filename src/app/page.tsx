@@ -181,7 +181,9 @@ export default async function Home() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button className="bg-white text-purple-600 hover:bg-gray-100">Ver más información</Button>
+              <Button className="bg-white text-purple-600 hover:bg-gray-100"> 
+                <Link href="/solicitud-evento">Ver más información</Link>
+                </Button>
             </div>
           </div>
         </div>

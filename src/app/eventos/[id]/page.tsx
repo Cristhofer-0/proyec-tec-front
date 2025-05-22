@@ -14,7 +14,8 @@ import type { ItemData } from "@/components/types/ItemData"
 import { useParams } from "next/navigation"
 import type { TicketData } from "@/components/types/TicketData"
 import { fetchTicketsByEventoId } from "@/services/eventos"
-import { set } from "react-hook-form"
+import { MapView } from "@/components/principales/map-view"
+
 
 export default function EventoDetalle() {
   const params = useParams()
@@ -43,6 +44,8 @@ export default function EventoDetalle() {
     loadData();
   }, [id]);
 
+
+
   const ticket = tickets.length > 0 ? tickets[0] : null;
 
   if (isLoading) {
@@ -69,7 +72,7 @@ export default function EventoDetalle() {
 
   return (
     <main className="bg-gray-50 min-h-screen pb-16">
-      {/* Hero Banner */}
+
       <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px]">
         <Image
           src={evento.bannerUrl || "/default-banner.jpg"}
@@ -155,12 +158,10 @@ export default function EventoDetalle() {
                 </div>
 
                 {/* Mapa */}
-                <div className="mt-8">
-                  <h3 className="text-xl font-bold mb-4">Ubicación</h3>
-                  <div className="bg-gray-200 rounded-lg h-[300px] flex items-center justify-center">
-                    <p className="text-gray-500">Mapa no disponible</p>
-                  </div>
-                </div>
+<div className="mt-8">
+  <MapView item={evento} />
+</div>
+
               </CardContent>
             </Card>
           </div>
@@ -197,15 +198,6 @@ export default function EventoDetalle() {
                     <Button variant="outline" size="icon" className="flex-1">
                       <Heart className="w-4 h-4" />
                     </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white shadow-lg border-none rounded-xl overflow-hidden">
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-bold mb-4">Eventos relacionados</h3>
-                  <div className="space-y-4">
-                    <p className="text-gray-600 text-sm">No hay eventos relacionados disponibles en este momento.</p>
                   </div>
                 </CardContent>
               </Card>
