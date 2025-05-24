@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { successToast } from "@/components/ui/custom-toast"
 
 export default function FormularioCambioRol() {
   const [formData, setFormData] = useState({
@@ -59,9 +60,8 @@ const handleSubmit = async (e: React.FormEvent) => {
       throw new Error(data.message || "Error al enviar la solicitud")
     }
 
-    toast({
-      title: "Solicitud enviada",
-      description: "Su solicitud de cambio de rol ha sido enviada correctamente.",
+    successToast({
+      description: "El correo se envió con éxito",
     })
 
     setFormData({
@@ -86,9 +86,23 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   return (
     <div className="container mx-auto py-10 px-4">
+      {/* Contenedor centrado con ancho mayor que el formulario */}
+      <div className="max-w-5xl mx-auto mb-8 p-8 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg shadow-lg text-center">
+        <h1 className="text-4xl font-extrabold mb-4">
+          ¿Quieres publicar tus eventos y llegar a más personas?
+        </h1>
+        <p className="text-lg mb-4">
+          En Joint With Us te ayudamos a difundir tus eventos para que tengan el alcance que merecen. Solo necesitas enviarnos tus datos y la información del evento para que nuestro equipo pueda verificar y aprobar tu publicación rápidamente.
+        </p>
+        <p className="text-md font-semibold">
+          ¡No pierdas la oportunidad de conectar con tu audiencia y hacer crecer tu comunidad! Completa el formulario a continuación y déjanos ayudarte a lograrlo.
+        </p>
+      </div>
+
+    <div className="container mx-auto py-10 px-4">
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
-          <CardTitle className="text-2xl">Solicitud de Cambio de Rol</CardTitle>
+          <CardTitle className="text-2xl">Complete el formulario</CardTitle>
           <CardDescription>Complete el formulario con sus datos para solicitar un cambio de rol.</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -174,6 +188,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           </CardFooter>
         </form>
       </Card>
+    </div>
     </div>
   )
 }

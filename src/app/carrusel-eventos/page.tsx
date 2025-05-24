@@ -1,4 +1,4 @@
-// src/app/eventos.tsx
+// Desde aqui se puede contrarlar las imagenes del carrousel
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 interface EventosProps {
   eventId: number;
@@ -21,7 +22,8 @@ useEffect(() => {
     .then((data) => {
       const urls = data
         .map((e: any) => e.BannerUrl)
-        .filter((url: string) => url.includes("res.cloudinary.com")); // Solo cloudinary
+        .filter((url: string) => url.includes("res.cloudinary.com"))
+        //.slice(0, 3); // 👈 Solo tomamos las 3 primeras imágenes
       setBanners(urls);
     })
     .catch(console.error);
@@ -63,11 +65,11 @@ useEffect(() => {
                   </h1>
                 </div>
                 <p className="mt-2 text-white/90 md:text-xl">
-                  ¡No te pierdas este gran evento!
+                  ¡No te pierdas estos grandes eventos!
                 </p>
                 <div className="mt-4 flex flex-col sm:flex-row gap-4">
                   <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                    Ver detalles
+                    <Link href="/eventos">Ver detalles</Link>
                   </Button>
                   <Button
                     variant="outline"

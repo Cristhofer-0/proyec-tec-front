@@ -3,10 +3,10 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Footer from "./utils/footer";
 import Header from "./utils/header";
-
+import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: "Joint With Us - Pagina",
+  title: "Joint With Us | Los mejores eventos de la comunidad",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico"
@@ -24,6 +24,7 @@ export default function RootLayout({
       <body>
         <Header />
           {children}
+          <Toaster />
         <Footer />
       </body>
     </html>

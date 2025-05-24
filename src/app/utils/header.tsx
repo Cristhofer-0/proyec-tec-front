@@ -40,16 +40,10 @@ const Header: React.FC = () => {
           </Link>
         </div>
         <nav className="hidden md:flex items-center gap-6 text-sm">
-          <Link href="#" className="font-medium transition-colors hover:text-primary">
-            Inicio
+          <Link href="/eventos" className="font-medium transition-colors hover:text-primary">
+            Eventos
           </Link>
-          <Link href="#" className="font-medium transition-colors hover:text-primary">
-            Fiestas
-          </Link>
-          <Link href="#" className="font-medium transition-colors hover:text-primary">
-            Conciertos
-          </Link>
-          <NavLink href="/solicitud-evento">Solicitud</NavLink>
+          <Link href="/solicitud-evento">Solicitud</Link>
           <Link href="#" className="font-medium transition-colors hover:text-primary">
             Contacto
           </Link>
