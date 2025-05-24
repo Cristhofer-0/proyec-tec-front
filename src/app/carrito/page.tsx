@@ -1,12 +1,41 @@
+"use client"
+import { useState,useEffect, } from "react"
+import { useRouter } from "next/navigation"
+
 import { Minus, Plus, ShoppingBag, Ticket } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 
 export default function CartPage() {
+
+
+const router = useRouter()
+
+  useEffect(() => {
+    async function validarSesion() {
+      try {
+        const res = await fetch("http://localhost:3000/usuarios/validar", {
+          method: "GET",
+          credentials: "include", // para enviar las cookies httpOnly automáticamente
+        });
+
+        if (!res.ok) {
+          router.push("/usuario/login");
+        }
+      } catch (error) {
+        console.error("Error validando sesión:", error);
+        router.push("/usuario/login");
+      }
+    }
+
+    validarSesion();
+  }, [router]);
+
+
+
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="flex items-center gap-2 mb-6">
