@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useUserStore } from "@/stores/userStore";
+import { validarSesion, loginUsuario } from "@/services/usuarios";
 
 import {
   Card,
@@ -44,24 +45,12 @@ export default function Login() {
   // Verificar sesión activa al montar el componente
   useEffect(() => {
     async function verificarAutenticacion() {
-      try {
-        const res = await fetch("http://localhost:3000/usuarios/validar", {
-          credentials: "include",
-        });
+      const data = await validarSesion();
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.user) {
-            setUser(data.user);
-            router.push("/");
-          } else {
-            setLoading(false);
-          }
-        } else {
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error("Error al verificar autenticación:", error);
+      if (data?.user) {
+        setUser(data.user);
+        router.push("/");
+      } else {
         setLoading(false);
       }
     }
@@ -69,32 +58,15 @@ export default function Login() {
     verificarAutenticacion();
   }, [router, setUser]);
 
-  async function verificarCorreo(data: LoginData): Promise<void> {
+
+ async function verificarCorreo(data: LoginData): Promise<void> {
     try {
-      const url = new URL("http://localhost:3000/usuarios/login");
-
-      const response = await fetch(url.toString(), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // ⬅️ Muy importante para recibir cookies
-        body: JSON.stringify({
-          email: data.email,
-          password: data.password,
-        }),
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok || !responseData) {
-        throw new Error(responseData?.message || "Error desconocido al iniciar sesión");
-      }
-
-      setUser(responseData.user); // ✅ Solo guarda los datos del usuario
+      const response = await loginUsuario(data.email, data.password);
+      setUser(response.user);
       router.push("/");
-    } catch (error: unknown) {
-      console.error("Error:", error);
+    } catch (error) {
+      console.error("Error en verificarCorreo:", error);
+      // podés setear error para mostrar en pantalla si querés
     }
   }
 

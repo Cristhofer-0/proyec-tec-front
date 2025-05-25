@@ -22,6 +22,8 @@ import { useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { validarSesion, cerrarSesion as cerrarSesionService } from "@/services/usuarios"
+import { obtenerHistorialDeOrdenes } from "@/services/ordenes";
 
 import { OrderMapped } from "@/components/types/carrito"
 
@@ -30,79 +32,33 @@ export default function ProfilePage() {
   const [comprados, setComprados] = useState<OrderMapped[]>([]);
   const router = useRouter()
 
-  useEffect(() => {
-    async function validarSesion() {
-      try {
-        const res = await fetch("http://localhost:3000/usuarios/validar", {
-          method: "GET",
-          credentials: "include", // para enviar las cookies httpOnly automáticamente
-        });
 
-        if (!res.ok) {
-          router.push("/usuario/login");
-        }
-      } catch (error) {
-        console.error("Error validando sesión:", error);
+  useEffect(() => {
+    async function checkSesion() {
+      const esValida = await validarSesion();
+      if (!esValida) {
         router.push("/usuario/login");
       }
     }
 
-    validarSesion();
+    checkSesion();
   }, [router]);
 
-
   useEffect(() => {
-    async function obtenerComprados() {
-      try {
-        const res = await fetch("http://localhost:3000/orders/historial", {
-          method: "POST",
-          credentials: "include", // para enviar las cookies httpOnly automáticamente
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          // El backend ya devuelve las órdenes mapeadas con la fecha incluida
-          const ordenesMapeadas: OrderMapped[] = data.ordenes.map((orden: any) => ({
-            id: orden.id,
-            title: orden.title || "Sin título",
-            description: orden.description || "Sin descripción",
-            image: orden.image || "/placeholder.svg",
-            quantity: orden.quantity,
-            totalPrice: orden.totalPrice,
-            price: orden.price,
-            type: orden.type,
-            date: orden.date, // La fecha ya viene del backend
-          }));
-
-          setComprados(ordenesMapeadas);
-        } else {
-          console.error("Error del servidor:", data.message);
-        }
-      } catch (error) {
-        console.error("Error al obtener los productos comprados", error);
-      }
+    async function cargarComprados() {
+      const ordenes = await obtenerHistorialDeOrdenes();
+      if (ordenes) setComprados(ordenes);
     }
 
-    obtenerComprados();
+    cargarComprados();
   }, []);
 
-
-
   async function cerrarSesion() {
-    try {
-      // Llamar al endpoint logout para que borre la cookie httpOnly en backend
-      const response = await fetch("http://localhost:3000/usuarios/logout", {
-        method: "DELETE",
-        credentials: "include" // importante para enviar cookies
-      })
-      if (response.ok) {
-        router.push("/usuario/login")
-      } else {
-        console.error("Error al cerrar sesión")
-      }
-    } catch (error) {
-      console.error("Error en la llamada logout:", error)
+    const ok = await cerrarSesionService(); // Evita que se llame asi mismo y no al import
+    if (ok) {
+      router.push("/usuario/login");
+    } else {
+      console.error("Error al cerrar sesión");
     }
   }
 

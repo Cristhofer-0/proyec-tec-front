@@ -1,9 +1,4 @@
 import Link from "next/link";
-import { Instagram, Facebook, Youtube } from "lucide-react";
-
-
-
-
 
 const Footer: React.FC = () => {
     return (

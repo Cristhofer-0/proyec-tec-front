@@ -1,5 +1,5 @@
 "use client"
-import { useState,useEffect, } from "react"
+import { useState, useEffect, } from "react"
 import { useRouter } from "next/navigation"
 
 import { Minus, Plus, ShoppingBag, Ticket } from "lucide-react"
@@ -8,58 +8,38 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { validarSesion } from "@/services/usuarios"
+import { obtenerCarrito } from "@/services/ordenes"
 
-import { OrderMapped} from "@/components/types/carrito" 
+import { OrderMapped } from "@/components/types/carrito"
 
 export default function CartPage() {
 
-  const [producto,setProducto] = useState<OrderMapped[]>([]);
+  const [producto, setProducto] = useState<OrderMapped[]>([]);
 
-const router = useRouter()
+  const router = useRouter()
 
   useEffect(() => {
-    async function validarSesion() {
-      try {
-        const res = await fetch("http://localhost:3000/usuarios/validar", {
-          method: "GET",
-          credentials: "include", // para enviar las cookies httpOnly automáticamente
-        });
-
-        if (!res.ok) {
-          router.push("/usuario/login");
-        }
-      } catch (error) {
-        console.error("Error validando sesión:", error);
+    async function checkSesion() {
+      const esValida = await validarSesion();
+      if (!esValida) {
         router.push("/usuario/login");
       }
     }
 
-    validarSesion();
+    checkSesion();
   }, [router]);
 
-useEffect(() => {
-async function verCarrito() {
-    try {
-      const res = await fetch('http://localhost:3000/orders/carrito', {
-        method: 'POST',
-        credentials: 'include',
-      });
-
-      if (!res.ok) {
-        console.error('Error en la respuesta:', res.statusText);
-        return;
+  useEffect(() => {
+    async function cargarCarrito() {
+      const ordenes = await obtenerCarrito();
+      if (ordenes) {
+        setProducto(ordenes);
       }
-
-      const data = await res.json();
-      // 🔥 ¡Corregido aquí!
-      setProducto(data.ordenes);
-    } catch (error) {
-      console.error('Error al obtener los productos:', error);
     }
-  }
 
-  verCarrito();
-}, [router]);
+    cargarCarrito();
+  }, [router]);
 
 
   return (
