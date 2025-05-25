@@ -59,7 +59,7 @@ export default function CartPage() {
                   <h2 className="text-xl font-semibold mb-2">Tu carrito está vacío</h2>
                   <p className="text-muted-foreground mb-4">Parece que aún no has añadido tickets a tu carrito.</p>
                   <Button asChild>
-                    <Link href="/events">Ver eventos disponibles</Link>
+                    <Link href="/eventos">Ver eventos disponibles</Link>
                   </Button>
                 </div>
               ) : (
@@ -165,7 +165,7 @@ export default function CartPage() {
               </div>
               <Button className="w-full mt-6">Proceder al pago</Button>
               <Button variant="outline" className="w-full mt-2" asChild>
-                <Link href="/events">Continuar comprando</Link>
+                <Link href="/eventos">Continuar comprando</Link>
               </Button>
             </CardContent>
           </Card>

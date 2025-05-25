@@ -29,7 +29,7 @@ export default async function Home() {
 
   return (
     <main className="flex-1">
-      <Eventos eventId={7} />
+      <Eventos  />
 
       {/* Categorías */}
       <section className="py-12 bg-gradient-to-b from-white to-purple-50">

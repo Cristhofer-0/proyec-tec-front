@@ -8,26 +8,24 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 
-interface EventosProps {
-  eventId: number;
-}
 
-export default function Eventos({ eventId }: EventosProps) {
+
+export default function Eventos() {
   const [banners, setBanners] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-useEffect(() => {
-  fetch("http://localhost:3000/eventos")
-    .then((res) => res.json())
-    .then((data) => {
-      const urls = data
-        .map((e: any) => e.BannerUrl)
-        .filter((url: string) => url.includes("res.cloudinary.com"))
+  useEffect(() => {
+    fetch("http://localhost:3000/eventos")
+      .then((res) => res.json())
+      .then((data) => {
+        const urls = data
+          .map((e: any) => e.BannerUrl)
+          .filter((url: string) => url.includes("res.cloudinary.com"))
         //.slice(0, 3); // 👈 Solo tomamos las 3 primeras imágenes
-      setBanners(urls);
-    })
-    .catch(console.error);
-}, []);
+        setBanners(urls);
+      })
+      .catch(console.error);
+  }, []);
 
   const prevBanner = () => {
     setCurrentIndex((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
@@ -54,29 +52,31 @@ useEffect(() => {
               <div className="w-full h-full bg-gray-200" />
             )}
 
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-900/40 to-pink-600/50 flex items-center justify-start pl-40 sm:pl-56 md:pl-49">
-              <div className="text-left space-y-3 max-w-xl">
-                <div className="space-y-2">
-                  <Badge className="bg-yellow-500 hover:bg-yellow-600 text-black">
-                    Destacado
-                  </Badge>
-                  <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl text-white">
-                    Eventos Destacados
-                  </h1>
-                </div>
-                <p className="mt-2 text-white/90 md:text-xl">
-                  ¡No te pierdas estos grandes eventos!
-                </p>
-                <div className="mt-4 flex flex-col sm:flex-row gap-4">
-                  <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                    <Link href="/eventos">Ver detalles</Link>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="border-white text-white hover:bg-white/10"
-                  >
-                    Reservar ahora
-                  </Button>
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-900/70 to-pink-600/50 flex items-center">
+              <div className="container px-4 md:px-6">
+                <div className="max-w-xl space-y-4">
+                  <div className="space-y-2">
+                    <Badge className="bg-yellow-500 hover:bg-yellow-600 text-black">
+                      Destacado
+                    </Badge>
+                    <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl text-white">
+                      Eventos Destacados
+                    </h1>
+                  </div>
+                  <p className="mt-2 text-white/90 md:text-xl">
+                    ¡No te pierdas estos grandes eventos!
+                  </p>
+                  <div className="mt-4 flex flex-col sm:flex-row gap-4">
+                    <Button className="bg-purple-600 hover:bg-purple-700 text-white">
+                      <Link href="/eventos">Ver detalles</Link>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="border-white text-white hover:bg-white/10"
+                    >
+                      Reservar ahora
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -244,3 +244,8 @@
 .accordion-up {
   animation: accordion-up 0.2s ease-out;
 }
+
+/* Esto oculta el icono de NextJs*/
+/*nextjs-portal {
+  display: none !important;
+}*/

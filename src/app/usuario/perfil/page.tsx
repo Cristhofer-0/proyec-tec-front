@@ -31,15 +31,20 @@ export default function ProfilePage() {
   const [activeSection, setActiveSection] = useState("account")
   const [comprados, setComprados] = useState<OrderMapped[]>([]);
   const router = useRouter()
+const [usuario, setUsuario] = useState<{ fullName: string; email: string } | null>(null);
 
-
-  useEffect(() => {
-    async function checkSesion() {
-      const esValida = await validarSesion();
-      if (!esValida) {
-        router.push("/usuario/login");
-      }
+useEffect(() => {
+  async function checkSesion() {
+    const res = await validarSesion();
+    if (!res || !res.user) {
+      router.push("/usuario/login");
+    } else {
+      setUsuario({
+        fullName: res.user.fullName,
+        email: res.user.email,
+      });
     }
+  }
 
     checkSesion();
   }, [router]);
@@ -75,8 +80,8 @@ export default function ProfilePage() {
                   <Image src="/placeholder.svg?height=64&width=64" alt="Avatar" fill className="object-cover" />
                 </div>
                 <div className="flex flex-col">
-                  <CardTitle>María García</CardTitle>
-                  <p className="text-sm text-gray-500">maria.garcia@ejemplo.com</p>
+                  <CardTitle>{usuario?.fullName || "Usuario"}</CardTitle>
+                  <p className="text-sm text-gray-500">{usuario?.email || "correo@ejemplo.com"}</p>
                 </div>
               </CardHeader>
               <CardContent>
@@ -106,20 +111,6 @@ export default function ProfilePage() {
                         className={`mr-3 h-5 w-5 ${activeSection === "purchases" ? "text-purple-600" : "text-gray-400"}`}
                       />
                       <span>Mis compras</span>
-                    </div>
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-
-                  <button
-                    onClick={() => setActiveSection("payment")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "payment" ? "bg-purple-50 text-purple-600" : ""
-                      }`}
-                  >
-                    <div className="flex items-center">
-                      <CreditCard
-                        className={`mr-3 h-5 w-5 ${activeSection === "payment" ? "text-purple-600" : "text-gray-400"}`}
-                      />
-                      <span>Métodos de pago</span>
                     </div>
                     <ChevronRight className="h-4 w-4" />
                   </button>
