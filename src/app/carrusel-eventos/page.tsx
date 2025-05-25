@@ -70,12 +70,6 @@ export default function Eventos() {
                     <Button className="bg-purple-600 hover:bg-purple-700 text-white">
                       <Link href="/eventos">Ver detalles</Link>
                     </Button>
-                    <Button
-                      variant="outline"
-                      className="border-white text-white hover:bg-white/10"
-                    >
-                      Reservar ahora
-                    </Button>
                   </div>
                 </div>
               </div>

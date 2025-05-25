@@ -18,57 +18,54 @@ import { getYoutubeId } from "@/components/types/Video"
 import { ShareButton } from "@/components/principales/ShareEvent"
 import React from "react"
 
-
-
 export default function EventoDetalle() {
   const params = useParams()
   const id = params?.id as string // asegúrate de que sea string
   const [evento, setEvento] = useState<ItemData | null>(null)
-  const [tickets, setTickets] = useState<TicketData[]>([]);
+  const [tickets, setTickets] = useState<TicketData[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [cantidades, setCantidades] = React.useState(() =>
-    tickets ? tickets.map(() => 0) : []
-  );
+  const [cantidades, setCantidades] = React.useState(() => (tickets ? tickets.map(() => 0) : []))
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false)
   // Cargar el evento y los tickets
   useEffect(() => {
     async function loadData() {
-      if (!id) return;
+      if (!id) return
       try {
-        setIsLoading(true);
-        const dataEvento = await fetchEventoById(id);
-        setEvento(dataEvento);
+        setIsLoading(true)
+        const dataEvento = await fetchEventoById(id)
+        setEvento(dataEvento)
 
-        const dataTickets = await fetchTicketsByEventoId(id);
-        setTickets(dataTickets);
-        setIsLoading(false);
+        const dataTickets = await fetchTicketsByEventoId(id)
+        setTickets(dataTickets)
+        setIsLoading(false)
       } catch (err) {
-        console.error(err);
-        setError("No se pudo cargar la información");
-        setIsLoading(false);
+        console.error(err)
+        setError("No se pudo cargar la información")
+        setIsLoading(false)
       }
     }
-    loadData();
-  }, [id]);
+    loadData()
+  }, [id])
 
   // Cargar incrementador y decrementador
   useEffect(() => {
     if (tickets && tickets.length > 0) {
-      setCantidades(tickets.map(() => 0));
+      setCantidades(tickets.map(() => 0))
     } else {
-      setCantidades([]);
+      setCantidades([])
     }
-  }, [tickets]);
+  }, [tickets])
 
   const handleComprar = async () => {
     try {
       const ticketsSeleccionados = tickets
         .map((ticket, index) => ({ ticket, cantidad: cantidades[index] }))
-        .filter(({ cantidad }) => cantidad > 0);
+        .filter(({ cantidad }) => cantidad > 0)
 
       if (ticketsSeleccionados.length === 0) {
-        alert("No has seleccionado ninguna entrada");
-        return;
+        alert("No has seleccionado ninguna entrada")
+        return
       }
 
       const body = {
@@ -76,58 +73,55 @@ export default function EventoDetalle() {
         tickets: ticketsSeleccionados.map(({ ticket, cantidad }) => ({
           ticketId: ticket.id,
           precioUnitario: ticket.precio,
-          cantidad: cantidad
-        }))
-      };
+          cantidad: cantidad,
+        })),
+      }
 
       const response = await fetch("http://localhost:3000/orders/agregar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
-        credentials: "include"
-      });
+        credentials: "include",
+      })
 
       if (response.ok) {
-        const data = await response.json();
-        console.log("Orden creada:", data);
-        alert("¡Orden creada con éxito!");
-        setCantidades(tickets.map(() => 0));
+        const data = await response.json()
+        console.log("Orden creada:", data)
+        setShowSuccessPopup(true)
+        setTimeout(() => {
+          setShowSuccessPopup(false)
+        }, 3000) // Desaparece después de 3 segundos
+        setCantidades(tickets.map(() => 0))
       } else {
         // 🚨 Usa text() para evitar fallo en el .json()
-        const errorText = await response.text();
-        console.error("Error al crear orden:", errorText);
-        alert("Error al crear la orden: " + errorText);
+        const errorText = await response.text()
+        console.error("Error al crear orden:", errorText)
+        alert("Error al crear la orden: " + errorText)
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("Error al procesar la orden: " + (error instanceof Error ? error.message : error));
+      console.error("Error:", error)
+      alert("Error al procesar la orden: " + (error instanceof Error ? error.message : error))
     }
-  };
-
-
-
+  }
 
   const incrementar = (index: number) => {
-    const newCantidades = [...cantidades];
+    const newCantidades = [...cantidades]
     if (newCantidades[index] < tickets[index].stockDisponible) {
-      newCantidades[index] += 1;
-      setCantidades(newCantidades);
+      newCantidades[index] += 1
+      setCantidades(newCantidades)
     }
-  };
+  }
 
   const decrementar = (index: number) => {
-    const newCantidades = [...cantidades];
+    const newCantidades = [...cantidades]
     if (newCantidades[index] > 0) {
-      newCantidades[index] -= 1;
-      setCantidades(newCantidades);
+      newCantidades[index] -= 1
+      setCantidades(newCantidades)
     }
-  };
+  }
 
-  const totalSeleccionado = cantidades.reduce((acc, val) => acc + val, 0);
-  const totalPrecio = cantidades.reduce(
-    (acc, cantidad, idx) => acc + cantidad * tickets[idx].precio,
-    0
-  );
+  const totalSeleccionado = cantidades.reduce((acc, val) => acc + val, 0)
+  const totalPrecio = cantidades.reduce((acc, cantidad, idx) => acc + cantidad * tickets[idx].precio, 0)
 
   if (isLoading) {
     return (
@@ -153,7 +147,6 @@ export default function EventoDetalle() {
 
   return (
     <main className="bg-gray-50 min-h-screen pb-16">
-
       <div className="relative w-full h-[300px] md:h-[400px] lg:h-[500px]">
         <Image
           src={evento.bannerUrl || "/default-banner.jpg"}
@@ -244,7 +237,6 @@ export default function EventoDetalle() {
                 <div className="mt-8">
                   <MapView item={evento} />
                 </div>
-
               </CardContent>
             </Card>
           </div>
@@ -265,9 +257,7 @@ export default function EventoDetalle() {
                             <span className="font-bold text-lg">S/. {ticket.precio}</span>
                           </div>
                           <div className="text-sm text-green-600 mb-3">
-                            {ticket.stockDisponible > 0
-                              ? `${ticket.stockDisponible} disponibles`
-                              : "Agotado"}
+                            {ticket.stockDisponible > 0 ? `${ticket.stockDisponible} disponibles` : "Agotado"}
                           </div>
 
                           <div className="flex items-center justify-between mb-2">
@@ -297,9 +287,7 @@ export default function EventoDetalle() {
 
                           <div className="flex justify-between items-center text-sm">
                             <span>Subtotal:</span>
-                            <span className="font-medium">
-                              S/. {(ticket.precio * cantidades[index]).toFixed(2)}
-                            </span>
+                            <span className="font-medium">S/. {(ticket.precio * cantidades[index]).toFixed(2)}</span>
                           </div>
                         </div>
                       ))}
@@ -335,6 +323,18 @@ export default function EventoDetalle() {
           </div>
         </div>
       </div>
+      {/* Popup de éxito */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 max-w-sm mx-4 text-center shadow-2xl transform animate-in fade-in duration-300">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Ticket className="w-8 h-8 text-green-600" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Compra realizada con éxito</h3>
+            <p className="text-gray-600">¡Nos vemos en el evento!</p>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
