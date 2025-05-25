@@ -7,7 +7,6 @@ import {
   CreditCard,
   ChevronRight,
   LogOut,
-  Edit,
   ShoppingBag,
   HelpCircle,
   Package,
@@ -24,11 +23,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
+import { OrderMapped } from "@/components/types/carrito"
+
 export default function ProfilePage() {
   const [activeSection, setActiveSection] = useState("account")
+  const [comprados, setComprados] = useState<OrderMapped[]>([]);
   const router = useRouter()
-
-
 
   useEffect(() => {
     async function validarSesion() {
@@ -49,6 +49,44 @@ export default function ProfilePage() {
 
     validarSesion();
   }, [router]);
+
+
+  useEffect(() => {
+    async function obtenerComprados() {
+      try {
+        const res = await fetch("http://localhost:3000/orders/historial", {
+          method: "POST",
+          credentials: "include", // para enviar las cookies httpOnly automáticamente
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          // El backend ya devuelve las órdenes mapeadas con la fecha incluida
+          const ordenesMapeadas: OrderMapped[] = data.ordenes.map((orden: any) => ({
+            id: orden.id,
+            title: orden.title || "Sin título",
+            description: orden.description || "Sin descripción",
+            image: orden.image || "/placeholder.svg",
+            quantity: orden.quantity,
+            totalPrice: orden.totalPrice,
+            price: orden.price,
+            type: orden.type,
+            date: orden.date, // La fecha ya viene del backend
+          }));
+
+          setComprados(ordenesMapeadas);
+        } else {
+          console.error("Error del servidor:", data.message);
+        }
+      } catch (error) {
+        console.error("Error al obtener los productos comprados", error);
+      }
+    }
+
+    obtenerComprados();
+  }, []);
+
 
 
   async function cerrarSesion() {
@@ -90,9 +128,8 @@ export default function ProfilePage() {
                 <nav className="space-y-1">
                   <button
                     onClick={() => setActiveSection("account")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
-                      activeSection === "account" ? "bg-purple-50 text-purple-600" : ""
-                    }`}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "account" ? "bg-purple-50 text-purple-600" : ""
+                      }`}
                   >
                     <div className="flex items-center">
                       <User
@@ -105,9 +142,8 @@ export default function ProfilePage() {
 
                   <button
                     onClick={() => setActiveSection("purchases")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
-                      activeSection === "purchases" ? "bg-purple-50 text-purple-600" : ""
-                    }`}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "purchases" ? "bg-purple-50 text-purple-600" : ""
+                      }`}
                   >
                     <div className="flex items-center">
                       <ShoppingBag
@@ -120,9 +156,8 @@ export default function ProfilePage() {
 
                   <button
                     onClick={() => setActiveSection("payment")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
-                      activeSection === "payment" ? "bg-purple-50 text-purple-600" : ""
-                    }`}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "payment" ? "bg-purple-50 text-purple-600" : ""
+                      }`}
                   >
                     <div className="flex items-center">
                       <CreditCard
@@ -135,9 +170,8 @@ export default function ProfilePage() {
 
                   <button
                     onClick={() => setActiveSection("settings")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
-                      activeSection === "settings" ? "bg-purple-50 text-purple-600" : ""
-                    }`}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "settings" ? "bg-purple-50 text-purple-600" : ""
+                      }`}
                   >
                     <div className="flex items-center">
                       <Settings
@@ -150,9 +184,8 @@ export default function ProfilePage() {
 
                   <button
                     onClick={() => setActiveSection("help")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
-                      activeSection === "help" ? "bg-purple-50 text-purple-600" : ""
-                    }`}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "help" ? "bg-purple-50 text-purple-600" : ""
+                      }`}
                   >
                     <div className="flex items-center">
                       <HelpCircle
@@ -230,34 +263,46 @@ export default function ProfilePage() {
                   <CardDescription>Historial de tus compras recientes</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {[1, 2, 3].map((item) => (
-                    <div key={item} className="mb-4 border rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="font-medium">Pedido #{Math.floor(Math.random() * 10000)}</h3>
-                          <p className="text-sm text-gray-500">Realizado el {new Date().toLocaleDateString()}</p>
+                  {comprados.length === 0 ? (
+                    <p className="text-center text-gray-500">No tienes compras aún.</p>
+                  ) : (
+                    comprados.map((item) => (
+                      <div key={item.id} className="mb-4 border rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h3 className="font-medium">Pedido #{item.id}</h3>
+                            <p className="text-sm text-gray-500">
+                              Realizado el {new Date(item.date).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <Badge variant={new Date(item.date) > new Date() ? "default" : "outline"}>
+                            {new Date(item.date) > new Date() ? "Válido" : "No válido"}
+                          </Badge>
+
                         </div>
-                        <Badge variant={item === 1 ? "default" : "outline"}>
-                          {item === 1 ? "En camino" : "Entregado"}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center gap-4 mt-4">
-                        <div className="h-16 w-16 bg-gray-100 rounded-md flex items-center justify-center">
-                          <Package className="h-8 w-8 text-gray-400" />
+
+                        <div className="flex items-center gap-4 mt-4">
+                          <div className="h-16 w-16 bg-gray-100 rounded-md flex items-center justify-center">
+                            <Package className="h-8 w-8 text-gray-400" />
+                          </div>
+                          <div>
+                            <p className="font-medium">Entradas de: {item.title}</p>
+                            <p className="text-sm text-gray-500">
+                              Cantidad: {item.quantity} - Precio total: S/{item.totalPrice}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium">Producto {item}</p>
-                          <p className="text-sm text-gray-500">€{(Math.random() * 100).toFixed(2)}</p>
+
+                        <div className="mt-4 flex justify-end">
+                          <Button variant="outline" size="sm">
+                            Ver detalles
+                          </Button>
                         </div>
                       </div>
-                      <div className="mt-4 flex justify-end">
-                        <Button variant="outline" size="sm">
-                          Ver detalles
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </CardContent>
+
               </Card>
             )}
 

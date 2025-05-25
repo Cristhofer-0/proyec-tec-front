@@ -9,8 +9,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 
+import { OrderMapped} from "@/components/types/carrito" 
+
 export default function CartPage() {
 
+  const [producto,setProducto] = useState<OrderMapped[]>([]);
 
 const router = useRouter()
 
@@ -34,6 +37,29 @@ const router = useRouter()
     validarSesion();
   }, [router]);
 
+useEffect(() => {
+async function verCarrito() {
+    try {
+      const res = await fetch('http://localhost:3000/orders/carrito', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        console.error('Error en la respuesta:', res.statusText);
+        return;
+      }
+
+      const data = await res.json();
+      // 🔥 ¡Corregido aquí!
+      setProducto(data.ordenes);
+    } catch (error) {
+      console.error('Error al obtener los productos:', error);
+    }
+  }
+
+  verCarrito();
+}, [router]);
 
 
   return (
@@ -47,7 +73,7 @@ const router = useRouter()
         <div className="lg:col-span-2">
           <Card>
             <CardContent className="p-6">
-              {cartItems.length === 0 ? (
+              {producto.length === 0 ? (
                 <div className="text-center py-10">
                   <Ticket className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                   <h2 className="text-xl font-semibold mb-2">Tu carrito está vacío</h2>
@@ -58,8 +84,8 @@ const router = useRouter()
                 </div>
               ) : (
                 <div className="space-y-6">
-                  <h2 className="text-xl font-semibold">Tickets seleccionados ({cartItems.length})</h2>
-                  {cartItems.map((item) => (
+                  <h2 className="text-xl font-semibold">Tickets seleccionados ({producto.length})</h2>
+                  {producto.map((item) => (
                     <div key={item.id}>
                       <div className="relative">
                         <Button
@@ -143,7 +169,7 @@ const router = useRouter()
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold mb-4">Resumen de compra</h2>
               <div className="space-y-2">
-                {cartItems.map((item) => (
+                {producto.map((item) => (
                   <div key={item.id} className="flex justify-between">
                     <span className="text-muted-foreground">
                       {item.title} - {item.type} ({item.quantity})
@@ -155,7 +181,7 @@ const router = useRouter()
               <Separator className="my-4" />
               <div className="flex justify-between font-semibold text-lg">
                 <span>Total</span>
-                <span>${cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}</span>
+                <span>${producto.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}</span>
               </div>
               <Button className="w-full mt-6">Proceder al pago</Button>
               <Button variant="outline" className="w-full mt-2" asChild>
@@ -168,55 +194,3 @@ const router = useRouter()
     </div>
   )
 }
-
-// Datos de ejemplo para el carrito
-const cartItems = [
-  {
-    id: 1,
-    title: "Festival de Música Primavera 2025",
-    description:
-      "El festival más grande del año con los mejores artistas nacionales e internacionales. Tres días de música en vivo, comida y diversión.",
-    image: "/placeholder.svg?height=400&width=600",
-    quantity: 2,
-    price: 89.99,
-    type: "General",
-  },
-  {
-    id: 2,
-    title: "Festival de Música Primavera 2025",
-    description: "Acceso a zonas exclusivas, meet & greet con artistas y barra libre durante todo el evento.",
-    image: "/placeholder.svg?height=400&width=600",
-    quantity: 1,
-    price: 199.99,
-    type: "VIP",
-  },
-  {
-    id: 3,
-    title: "Concierto de Rock Clásico",
-    description:
-      "Una noche inolvidable con las mejores bandas de rock clásico de todos los tiempos. Revive los grandes éxitos en un ambiente único.",
-    image: "/placeholder.svg?height=400&width=600",
-    quantity: 1,
-    price: 59.99,
-    type: "General",
-  },
-  {
-    id: 4,
-    title: "Concierto de Rock Clásico",
-    description: "Incluye asientos premium, acceso al backstage y cóctel de bienvenida con los artistas.",
-    image: "/placeholder.svg?height=400&width=600",
-    quantity: 2,
-    price: 129.99,
-    type: "VIP",
-  },
-  {
-    id: 5,
-    title: "Teatro: Romeo y Julieta",
-    description:
-      "La obra clásica de Shakespeare interpretada por los mejores actores del momento. Una producción espectacular que no te puedes perder.",
-    image: "/placeholder.svg?height=400&width=600",
-    quantity: 3,
-    price: 45.5,
-    type: "General",
-  },
-]

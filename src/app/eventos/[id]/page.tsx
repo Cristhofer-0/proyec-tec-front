@@ -3,12 +3,11 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { ArrowLeft, Calendar, Clock, MapPin, User, Ticket, Share2, Heart, Play } from "lucide-react"
+import { ArrowLeft, Calendar, Clock, MapPin, Ticket } from "lucide-react"
 import { fetchEventoById } from "@/services/eventos"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 import { formatearFecha } from "@/components/types/Fechas"
 import type { ItemData } from "@/components/types/ItemData"
 import { useParams } from "next/navigation"
@@ -61,6 +60,53 @@ export default function EventoDetalle() {
     }
   }, [tickets]);
 
+  const handleComprar = async () => {
+    try {
+      const ticketsSeleccionados = tickets
+        .map((ticket, index) => ({ ticket, cantidad: cantidades[index] }))
+        .filter(({ cantidad }) => cantidad > 0);
+
+      if (ticketsSeleccionados.length === 0) {
+        alert("No has seleccionado ninguna entrada");
+        return;
+      }
+
+      const body = {
+        eventId: id,
+        tickets: ticketsSeleccionados.map(({ ticket, cantidad }) => ({
+          ticketId: ticket.id,
+          precioUnitario: ticket.precio,
+          cantidad: cantidad
+        }))
+      };
+
+      const response = await fetch("http://localhost:3000/orders/agregar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        credentials: "include"
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Orden creada:", data);
+        alert("¡Orden creada con éxito!");
+        setCantidades(tickets.map(() => 0));
+      } else {
+        // 🚨 Usa text() para evitar fallo en el .json()
+        const errorText = await response.text();
+        console.error("Error al crear orden:", errorText);
+        alert("Error al crear la orden: " + errorText);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Error al procesar la orden: " + (error instanceof Error ? error.message : error));
+    }
+  };
+
+
+
+
   const incrementar = (index: number) => {
     const newCantidades = [...cantidades];
     if (newCantidades[index] < tickets[index].stockDisponible) {
@@ -82,9 +128,6 @@ export default function EventoDetalle() {
     (acc, cantidad, idx) => acc + cantidad * tickets[idx].precio,
     0
   );
-
-
-  const ticket = tickets.length > 0 ? tickets[0] : null;
 
   if (isLoading) {
     return (
@@ -270,6 +313,7 @@ export default function EventoDetalle() {
                         <Button
                           className="w-full bg-purple-600 hover:bg-purple-700 mb-3"
                           disabled={totalSeleccionado === 0}
+                          onClick={handleComprar}
                         >
                           <Ticket className="w-4 h-4 mr-2" />
                           {totalSeleccionado > 0 ? "Comprar" : "Selecciona entradas"}
