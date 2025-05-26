@@ -30,18 +30,48 @@ export default function CartPage() {
     checkSesion();
   }, [router]);
 
-  useEffect(() => {
-    async function cargarCarrito() {
-      const ordenes = await obtenerCarrito();
-      if (ordenes) {
-        setProducto(ordenes);
-      }
+  // Función declarada aquí para usarla en useEffect y eliminarProducto
+  const cargarCarrito = async () => {
+    const ordenes = await obtenerCarrito();
+    if (ordenes) {
+      setProducto(ordenes);
     }
+  };
 
+  useEffect(() => {
     cargarCarrito();
   }, [router]);
 
+  const eliminarProducto = async (orderId: number) => {
+  try {
+    const response = await fetch('http://localhost:3000/orders/eliminar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orderId }),
+      credentials: 'include',
+    });
 
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Producto eliminado:', data);
+      // Refrescar el carrito si quieres
+
+      await cargarCarrito();
+
+    } else {
+      const errorText = await response.text();
+      console.error('Error al eliminar orden:', errorText);
+      alert('Error al eliminar la orden: ' + errorText);
+    }
+  } catch (error) {
+    console.error('Error al eliminar producto:', error);
+    alert('Error al procesar la orden: ' + (error instanceof Error ? error.message : error));
+  }
+};
+
+    
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="flex items-center gap-2 mb-6">
@@ -73,6 +103,7 @@ export default function CartPage() {
                           size="icon"
                           className="absolute right-0 top-0 text-muted-foreground hover:text-destructive z-10"
                           aria-label={`Eliminar ${item.title} del carrito`}
+                          onClick={() => eliminarProducto(item.id)}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
