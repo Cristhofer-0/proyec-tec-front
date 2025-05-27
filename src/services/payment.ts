@@ -1,4 +1,8 @@
 // services/payment.ts
+import type { Stripe } from '@stripe/stripe-js';
+
+
+
 export const eliminarProducto = async (orderId: number) => {
   try {
     const response = await fetch('http://localhost:3000/orders/eliminar', {
@@ -23,7 +27,7 @@ export const eliminarProducto = async (orderId: number) => {
   }
 };
 
-export const iniciarPago = async (stripePromise: any) => {
+export const iniciarPago = async (stripePromise: Promise<Stripe | null>) => {
   try {
     const response = await fetch('http://localhost:3000/createSessionFromPendingOrders', {
       method: 'POST',
@@ -38,6 +42,11 @@ export const iniciarPago = async (stripePromise: any) => {
     }
 
     const stripe = await stripePromise;
+
+    if (!stripe) {
+      throw new Error('Stripe no está inicializado.');
+    }
+
     const { error } = await stripe.redirectToCheckout({ sessionId: session.id });
 
     if (error) {
