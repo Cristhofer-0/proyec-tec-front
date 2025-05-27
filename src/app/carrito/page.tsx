@@ -1,24 +1,31 @@
-"use client"
-import { useState, useEffect, } from "react"
-import { useRouter } from "next/navigation"
+"use client";
 
-import { Minus, Plus, ShoppingBag, Ticket } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { validarSesion } from "@/services/usuarios"
-import { obtenerCarrito } from "@/services/ordenes"
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Minus, Plus, ShoppingBag, Ticket } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
-import { OrderMapped } from "@/components/types/carrito"
+import { validarSesion } from "@/services/usuarios";
+import { obtenerCarrito } from "@/services/ordenes";
+import { eliminarProducto as eliminarProductoService, iniciarPago } from "@/services/payment";
+
+import { OrderMapped } from "@/components/types/carrito";
+import { loadStripe } from '@stripe/stripe-js';
+import { toast } from "@/components/ui/use-toast";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY as string);
 
 export default function CartPage() {
-
   const [producto, setProducto] = useState<OrderMapped[]>([]);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const status = searchParams.get('status');
 
-  const router = useRouter()
-
+  // Validar sesión
   useEffect(() => {
     async function checkSesion() {
       const esValida = await validarSesion();
@@ -26,11 +33,10 @@ export default function CartPage() {
         router.push("/usuario/login");
       }
     }
-
     checkSesion();
   }, [router]);
 
-  // Función declarada aquí para usarla en useEffect y eliminarProducto
+  // Cargar carrito
   const cargarCarrito = async () => {
     const ordenes = await obtenerCarrito();
     if (ordenes) {
@@ -42,36 +48,44 @@ export default function CartPage() {
     cargarCarrito();
   }, [router]);
 
-  const eliminarProducto = async (orderId: number) => {
-  try {
-    const response = await fetch('http://localhost:3000/orders/eliminar', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ orderId }),
-      credentials: 'include',
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Producto eliminado:', data);
-      // Refrescar el carrito si quieres
-
+  // Eliminar producto
+  const handleEliminarProducto = async (orderId: number) => {
+    try {
+      await eliminarProductoService(orderId);
       await cargarCarrito();
-
-    } else {
-      const errorText = await response.text();
-      console.error('Error al eliminar orden:', errorText);
-      alert('Error al eliminar la orden: ' + errorText);
+    } catch (error) {
+      console.error('Error al eliminar producto:', error);
+      alert('Error al procesar la orden: ' + (error instanceof Error ? error.message : error));
     }
-  } catch (error) {
-    console.error('Error al eliminar producto:', error);
-    alert('Error al procesar la orden: ' + (error instanceof Error ? error.message : error));
-  }
-};
+  };
 
-    
+  // Pagar
+  const handlePagar = async () => {
+    try {
+      await iniciarPago(stripePromise);
+    } catch (error) {
+      console.error('Error al procesar el pago:', error);
+      alert('Error al procesar el pago: ' + (error instanceof Error ? error.message : error));
+    }
+  };
+
+  // Toast según status
+  useEffect(() => {
+    if (status) {
+      const data = {
+        title: status === "cancelled" ? "Compra CANCELADA" : "Compra PAGADA",
+        description: status === "cancelled" ? "Has cancelado la compra." : "Has realizado la compra con éxito.",
+        variant: status === "cancelled" ? "destructive" : "default" as "default" | "destructive"
+      };
+
+      setTimeout(() => {
+        toast(data);
+      }, 100);
+
+      router.replace("/carrito");
+    }
+  }, [status, router]);
+
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="flex items-center gap-2 mb-6">
@@ -103,7 +117,7 @@ export default function CartPage() {
                           size="icon"
                           className="absolute right-0 top-0 text-muted-foreground hover:text-destructive z-10"
                           aria-label={`Eliminar ${item.title} del carrito`}
-                          onClick={() => eliminarProducto(item.id)}
+                          onClick={() => handleEliminarProducto(item.id)}
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -159,8 +173,8 @@ export default function CartPage() {
                                 </Button>
                               </div>
                               <div className="text-right">
-                                <div className="text-sm text-muted-foreground">${item.price.toFixed(2)} / ticket</div>
-                                <div className="font-semibold">${(item.price * item.quantity).toFixed(2)}</div>
+                                <div className="text-sm text-muted-foreground">S/{item.price.toFixed(2)} / ticket</div>
+                                <div className="font-semibold">S/{(item.price * item.quantity).toFixed(2)}</div>
                               </div>
                             </div>
                           </div>
@@ -194,7 +208,7 @@ export default function CartPage() {
                 <span>Total</span>
                 <span>${producto.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}</span>
               </div>
-              <Button className="w-full mt-6">Proceder al pago</Button>
+              <Button className="w-full mt-6" onClick={handlePagar} >Proceder al pago</Button>
               <Button variant="outline" className="w-full mt-2" asChild>
                 <Link href="/eventos">Continuar comprando</Link>
               </Button>

@@ -222,8 +222,8 @@ useEffect(() => {
                               Realizado el {new Date(item.date).toLocaleDateString()}
                             </p>
                           </div>
-                          <Badge variant={new Date(item.date) > new Date() ? "default" : "outline"}>
-                            {new Date(item.date) > new Date() ? "Válido" : "No válido"}
+                          <Badge variant={new Date(item.date) < new Date() ? "default" : "outline"}>
+                            {new Date(item.date) < new Date() ? "Válido" : "No válido"}
                           </Badge>
 
                         </div>
