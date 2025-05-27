@@ -1,4 +1,3 @@
-// Desde aqui se puede contrarlar las imagenes del carrousel
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,10 +5,8 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { API_BASE_URL } from "@/lib/config"
+import { API_BASE_URL } from "@/lib/config";
 import Link from "next/link";
-
-
 
 export default function Eventos() {
   const [banners, setBanners] = useState<string[]>([]);
@@ -21,12 +18,22 @@ export default function Eventos() {
       .then((data) => {
         const urls = data
           .map((e: any) => e.BannerUrl)
-          .filter((url: string) => url.includes("res.cloudinary.com"))
-        //.slice(0, 3); // 👈 Solo tomamos las 3 primeras imágenes
+          .filter((url: string) => url.includes("res.cloudinary.com"));
         setBanners(urls);
       })
       .catch(console.error);
   }, []);
+
+  // Slide automático
+  useEffect(() => {
+    if (banners.length === 0) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
+    }, 5000); // Cambia de imagen cada 5 segundos
+
+    return () => clearInterval(interval); // Limpia el intervalo al desmontar o al cambiar banners
+  }, [banners]);
 
   const prevBanner = () => {
     setCurrentIndex((prev) => (prev === 0 ? banners.length - 1 : prev - 1));

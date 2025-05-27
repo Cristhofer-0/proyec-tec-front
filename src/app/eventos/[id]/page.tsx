@@ -336,8 +336,8 @@ export default function EventoDetalle() {
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Ticket className="w-10 h-10 text-green-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">Compra realizada con éxito</h3>
-            <p className="text-gray-600">¡Nos vemos en el evento!</p>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Entrada añadida al carrito</h3>
+            <p className="text-gray-600">¡Continúa explorando nuestros eventos para encontrar más!</p>
           </div>
         </div>
       )}

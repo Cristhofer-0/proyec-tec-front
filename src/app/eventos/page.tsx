@@ -89,7 +89,7 @@ const aplicarFiltros = () => {
   setFilteredEventos(filtrados)
 }
   return (
-    <main className="py-12 bg-gradient-to-b from-white to-gray-50 min-h-screen">
+    <main className="py-12 bg-gradient-to-b  from-blue-50 to-indigo-100 min-h-screen">
       <div className="container px-4 md:px-6 mx-auto">
         <h1 className="text-4xl font-bold text-center mb-2 text-gray-900">Todos los Eventos</h1>
         <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
