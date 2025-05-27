@@ -33,7 +33,7 @@ export default function Login() {
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [emailLleno, setEmailLleno] = useState(false);
   const [loading, setLoading] = useState(true); // para mostrar mientras verifica la sesión
-
+  const [errorServidor, setErrorServidor] = useState(""); // <<< estado para error de servidor
   const valorEmail = watch("email");
 
   useEffect(() => {
@@ -59,16 +59,23 @@ export default function Login() {
   }, [router, setUser]);
 
 
- async function verificarCorreo(data: LoginData): Promise<void> {
+  async function verificarCorreo(data: LoginData): Promise<void> {
     try {
       const response = await loginUsuario(data.email, data.password);
       setUser(response.user);
       router.push("/");
-    } catch (error) {
+      setErrorServidor(""); // limpiar error al iniciar sesión con éxito
+    } catch (error: any) {
       console.error("Error en verificarCorreo:", error);
-      // podés setear error para mostrar en pantalla si querés
+      // Mostrar mensaje de error personalizado según respuesta
+      if (error?.response?.data?.message) {
+        setErrorServidor(error.response.data.message);
+      } else {
+        setErrorServidor("La contraseña o el correo son incorrectos");
+      }
     }
   }
+
 
   // Función para mostrar/ocultar la contraseña
   function verContaseña() {
@@ -143,6 +150,10 @@ export default function Login() {
                   {errors.password.type === "minLength" && "La contraseña debe tener al menos 6 caracteres"}
                   {errors.password.type === "maxLength" && "La contraseña no debe exceder los 20 caracteres"}
                 </p>
+              )}
+
+              {errorServidor && !errors.password && (
+                <p className="text-sm text-red-600">{errorServidor}</p>
               )}
             </div>
 

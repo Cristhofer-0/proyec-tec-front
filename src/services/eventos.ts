@@ -1,9 +1,8 @@
 import { ItemData } from "@/components/types/ItemData"
 import { TicketData } from "@/components/types/TicketData"
-
+import { API_BASE_URL } from "@/lib/config"
 
 export async function fetchEventos(): Promise<ItemData[]> {
-	const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 	const response = await fetch(`${API_BASE_URL}/eventos`)
 	if (!response.ok) {
 		throw new Error("No se pudo obtener la lista de eventos")
@@ -38,7 +37,6 @@ export async function fetchEventos(): Promise<ItemData[]> {
 }
 
 export async function fetchEventoById(id: string): Promise<ItemData> {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
   const response = await fetch(`${API_BASE_URL}/eventos/${id}`)
 
@@ -76,7 +74,6 @@ export async function fetchEventoById(id: string): Promise<ItemData> {
 }
 
 export async function fetchTicketsByEventoId(eventoId: string): Promise<TicketData[]> {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
   const response = await fetch(`${API_BASE_URL}/tickets?eventoId=${eventoId}`);
   if (!response.ok) throw new Error("Error fetching tickets");
   const tickets = await response.json();

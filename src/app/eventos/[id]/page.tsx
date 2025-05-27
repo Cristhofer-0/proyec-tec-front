@@ -16,6 +16,7 @@ import { fetchTicketsByEventoId } from "@/services/eventos"
 import { MapView } from "@/components/principales/map-view"
 import { getYoutubeId } from "@/components/types/Video"
 import { ShareButton } from "@/components/principales/ShareEvent"
+import { API_BASE_URL } from "@/lib/config"
 import React from "react"
 
 export default function EventoDetalle() {
@@ -27,6 +28,7 @@ export default function EventoDetalle() {
   const [error, setError] = useState<string | null>(null)
   const [cantidades, setCantidades] = React.useState(() => (tickets ? tickets.map(() => 0) : []))
   const [showSuccessPopup, setShowSuccessPopup] = useState(false)
+  const [showLoginPopup, setShowLoginPopup] = useState(false)
   // Cargar el evento y los tickets
   useEffect(() => {
     async function loadData() {
@@ -77,7 +79,8 @@ export default function EventoDetalle() {
         })),
       }
 
-      const response = await fetch("http://localhost:3000/orders/agregar", {
+
+      const response = await fetch(`${API_BASE_URL}/orders/agregar`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -96,7 +99,10 @@ export default function EventoDetalle() {
         // 🚨 Usa text() para evitar fallo en el .json()
         const errorText = await response.text()
         console.error("Error al crear orden:", errorText)
-        alert("Error al crear la orden: " + errorText)
+        setShowLoginPopup(true)
+        setTimeout(() => {
+          setShowLoginPopup(false)
+        }, 3000)
       }
     } catch (error) {
       console.error("Error:", error)
@@ -328,12 +334,31 @@ export default function EventoDetalle() {
         <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-8 max-w-sm mx-4 text-center shadow-2xl transform animate-in fade-in duration-300">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Ticket className="w-8 h-8 text-green-600" />
+              <Ticket className="w-10 h-10 text-green-600" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Compra realizada con éxito</h3>
             <p className="text-gray-600">¡Nos vemos en el evento!</p>
           </div>
         </div>
+      )}
+
+      {/* Popup de logeo */}
+      {showLoginPopup && (
+        <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl transform animate-in fade-in duration-300">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md">
+              <Ticket className="w-10 h-10 text-green-600" />
+            </div>
+            <h3 className="text-2xl font-semibold text-gray-800 mb-3">Inicie sesión para comprar</h3>
+            <p className="text-gray-500 mb-6">Acceda a su cuenta para completar la compra y disfrutar de nuestros productos exclusivos.</p>
+            <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-200">
+              <Link href="/usuario/login">
+                Iniciar Sesión
+              </Link>
+            </button>
+          </div>
+        </div>
+
       )}
     </main>
   )

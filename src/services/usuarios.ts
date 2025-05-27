@@ -1,6 +1,9 @@
+import { API_BASE_URL } from "@/lib/config"
+
+
 export async function validarSesion(): Promise<{ user?: any } | null> {
   try {
-    const res = await fetch("http://localhost:3000/usuarios/validar", {
+    const res = await fetch(`${API_BASE_URL}/usuarios/validar`, {
       credentials: "include",
     });
 
@@ -16,7 +19,7 @@ export async function validarSesion(): Promise<{ user?: any } | null> {
 
 export async function loginUsuario(email: string, password: string): Promise<{ user?: any }> {
   try {
-    const res = await fetch("http://localhost:3000/usuarios/login", {
+    const res = await fetch(`${API_BASE_URL}/usuarios/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -38,7 +41,7 @@ export async function loginUsuario(email: string, password: string): Promise<{ u
 
 export async function cerrarSesion(): Promise<boolean> {
   try {
-    const response = await fetch("http://localhost:3000/usuarios/logout", {
+    const response = await fetch(`${API_BASE_URL}/usuarios/logout`, {
       method: "DELETE",
       credentials: "include",
     });

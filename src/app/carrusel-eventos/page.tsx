@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { API_BASE_URL } from "@/lib/config"
 import Link from "next/link";
 
 
@@ -15,7 +16,7 @@ export default function Eventos() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    fetch("http://localhost:3000/eventos")
+    fetch(`${API_BASE_URL}/eventos`)
       .then((res) => res.json())
       .then((data) => {
         const urls = data
