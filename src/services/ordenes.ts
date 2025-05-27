@@ -1,8 +1,9 @@
 import { OrderMapped } from "@/components/types/carrito"
+import { API_BASE_URL } from "@/lib/config"
 
 export async function obtenerCarrito() {
   try {
-    const res = await fetch('http://localhost:3000/orders/carrito', {
+    const res = await fetch(`${API_BASE_URL}/orders/carrito`, {
       method: 'POST',
       credentials: 'include',
     });
@@ -23,7 +24,7 @@ export async function obtenerCarrito() {
 
 export async function obtenerHistorialDeOrdenes(): Promise<OrderMapped[] | null> {
   try {
-    const res = await fetch("http://localhost:3000/orders/historial", {
+    const res = await fetch(`${API_BASE_URL}/orders/historial`, {
       method: "POST",
       credentials: "include",
     });

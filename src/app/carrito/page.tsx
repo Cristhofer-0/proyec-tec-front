@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { validarSesion } from "@/services/usuarios"
 import { obtenerCarrito } from "@/services/ordenes"
-
+import { API_BASE_URL } from "@/lib/config"
 import { OrderMapped } from "@/components/types/carrito"
 
 export default function CartPage() {
@@ -43,35 +43,35 @@ export default function CartPage() {
   }, [router]);
 
   const eliminarProducto = async (orderId: number) => {
-  try {
-    const response = await fetch('http://localhost:3000/orders/eliminar', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ orderId }),
-      credentials: 'include',
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/orders/eliminar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ orderId }),
+        credentials: 'include',
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log('Producto eliminado:', data);
-      // Refrescar el carrito si quieres
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Producto eliminado:', data);
+        // Refrescar el carrito si quieres
 
-      await cargarCarrito();
+        await cargarCarrito();
 
-    } else {
-      const errorText = await response.text();
-      console.error('Error al eliminar orden:', errorText);
-      alert('Error al eliminar la orden: ' + errorText);
+      } else {
+        const errorText = await response.text();
+        console.error('Error al eliminar orden:', errorText);
+        alert('Error al eliminar la orden: ' + errorText);
+      }
+    } catch (error) {
+      console.error('Error al eliminar producto:', error);
+      alert('Error al procesar la orden: ' + (error instanceof Error ? error.message : error));
     }
-  } catch (error) {
-    console.error('Error al eliminar producto:', error);
-    alert('Error al procesar la orden: ' + (error instanceof Error ? error.message : error));
-  }
-};
+  };
 
-    
+
   return (
     <div className="container mx-auto py-10 px-4">
       <div className="flex items-center gap-2 mb-6">

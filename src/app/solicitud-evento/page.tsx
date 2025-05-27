@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { successToast } from "@/components/ui/custom-toast"
+import { API_BASE_URL } from "@/lib/config"
 
 export default function FormularioCambioRol() {
   const [formData, setFormData] = useState({
@@ -47,7 +48,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   }
 
   try {
-    const response = await fetch("http://localhost:3000/solicitud-evento", {
+    const response = await fetch(`${API_BASE_URL}/solicitud-evento`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
