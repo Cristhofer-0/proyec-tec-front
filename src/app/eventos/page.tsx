@@ -20,76 +20,77 @@ export default function EventosPage() {
   const [categorias, setCategorias] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-// Función para eliminar tildes y normalizar texto para comparar
-function normalizeText(text: string) {
-  return text
-    .toLowerCase()
-    .normalize("NFD") // descompone caracteres con tilde en base + tilde
-    .replace(/[\u0300-\u036f]/g, "") // elimina los diacríticos (tildes)
-    .trim()
-}
-
-
-
-useEffect(() => {
-  async function loadEventos() {
-    try {
-      const data = await fetchEventos()
-      setEventos(data)
-      setFilteredEventos(data)
-      setIsLoading(false)
-
-      // Extraer categorías únicas y normalizarlas
-      const categoriasMap = new Map()
-
-      data.flatMap((evento) => evento.categorias || []).forEach((cat) => {
-        const catTrimmed = cat.trim()
-        if (catTrimmed === "") return
-
-        const catNorm = normalizeText(catTrimmed) // normalizar para comparar
-
-        // Si no existe la categoría normalizada, la agregamos con la forma capitalizada original
-        if (!categoriasMap.has(catNorm)) {
-          // Mostrar la categoría con mayúscula inicial y manteniendo tildes originales
-          const displayCat =
-            catTrimmed.charAt(0).toUpperCase() + catTrimmed.slice(1).toLowerCase()
-          categoriasMap.set(catNorm, displayCat)
-        }
-      })
-
-      setCategorias(Array.from(categoriasMap.values()))
-    } catch (error) {
-      console.error("Error fetching eventos:", error)
-      setIsLoading(false)
-    }
+  // Función para normalizar texto
+  function normalizeText(text: string) {
+    return text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim()
   }
 
-  loadEventos()
-}, [])
+  useEffect(() => {
+    async function loadEventos() {
+      try {
+        const data = await fetchEventos()
+        setEventos(data)
+        setFilteredEventos(data)
+        setIsLoading(false)
 
-const aplicarFiltros = () => {
-  const texto = normalizeText(searchTerm)  // también normalizamos texto de búsqueda
-  const catSeleccionadaNorm = normalizeText(categoriaSeleccionada)
+        const categoriasMap = new Map()
 
-  const filtrados = eventos.filter((evento) => {
-    const coincideTexto =
-      normalizeText(evento.titulo).includes(texto) ||
-      (Array.isArray(evento.categorias) &&
-        evento.categorias.some((cat) => normalizeText(cat).includes(texto))) ||
-      (typeof evento.direccion === "string" && normalizeText(evento.direccion).includes(texto))
+        data.flatMap((evento) => evento.categorias || []).forEach((cat) => {
+          const catTrimmed = cat.trim()
+          if (catTrimmed === "") return
 
-    const coincideCategoria =
-      categoriaSeleccionada === "all" ||
-      (Array.isArray(evento.categorias) &&
-        evento.categorias.some((cat) => normalizeText(cat) === catSeleccionadaNorm))
+          const catNorm = normalizeText(catTrimmed)
 
-    return coincideTexto && coincideCategoria
-  })
+          if (!categoriasMap.has(catNorm)) {
+            const displayCat = catTrimmed.charAt(0).toUpperCase() + catTrimmed.slice(1).toLowerCase()
+            categoriasMap.set(catNorm, displayCat)
+          }
+        })
 
-  setFilteredEventos(filtrados)
-}
+        setCategorias(Array.from(categoriasMap.values()))
+      } catch (error) {
+        console.error("Error fetching eventos:", error)
+        setIsLoading(false)
+      }
+    }
+
+    loadEventos()
+  }, [])
+
+  // Función de filtrado
+  const aplicarFiltros = () => {
+    const texto = normalizeText(searchTerm)
+    const catSeleccionadaNorm = normalizeText(categoriaSeleccionada)
+
+    const filtrados = eventos.filter((evento) => {
+      const coincideTexto =
+        normalizeText(evento.titulo).includes(texto) ||
+        (Array.isArray(evento.categorias) &&
+          evento.categorias.some((cat) => normalizeText(cat).includes(texto))) ||
+        (typeof evento.direccion === "string" && normalizeText(evento.direccion).includes(texto))
+
+      const coincideCategoria =
+        categoriaSeleccionada === "all" ||
+        (Array.isArray(evento.categorias) &&
+          evento.categorias.some((cat) => normalizeText(cat) === catSeleccionadaNorm))
+
+      return coincideTexto && coincideCategoria
+    })
+
+    setFilteredEventos(filtrados)
+  }
+
+  // Filtrado automático (opcional)
+  useEffect(() => {
+    aplicarFiltros()
+  }, [searchTerm, categoriaSeleccionada, eventos])
+
   return (
-    <main className="py-12 bg-gradient-to-b  from-blue-50 to-indigo-100 min-h-screen">
+    <main className="py-12 bg-gradient-to-b from-blue-50 to-indigo-100 min-h-screen">
       <div className="container px-4 md:px-6 mx-auto">
         <h1 className="text-4xl font-bold text-center mb-2 text-gray-900">Todos los Eventos</h1>
         <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
@@ -119,7 +120,7 @@ const aplicarFiltros = () => {
               <SelectContent className="bg-white">
                 <SelectItem value="all">Todas</SelectItem>
                 {categorias
-                  .filter((cat) => cat && cat.trim() !== "") // evita vacíos
+                  .filter((cat) => cat && cat.trim() !== "")
                   .map((cat) => (
                     <SelectItem key={cat} value={cat}>
                       {cat}
@@ -128,10 +129,6 @@ const aplicarFiltros = () => {
               </SelectContent>
             </Select>
           </div>
-
-          <Button onClick={aplicarFiltros} className="bg-purple-600 hover:bg-purple-700 w-full md:w-auto h-10 px-6">
-            Filtrar
-          </Button>
         </div>
 
         {isLoading ? (

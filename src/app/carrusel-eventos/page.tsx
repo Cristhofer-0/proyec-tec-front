@@ -18,7 +18,8 @@ export default function Eventos() {
       .then((data) => {
         const urls = data
           .map((e: any) => e.BannerUrl)
-          .filter((url: string) => url.includes("res.cloudinary.com"));
+          .filter((url: string) => url.includes("res.cloudinary.com"))
+          .slice(0, 3); 
         setBanners(urls);
       })
       .catch(console.error);
