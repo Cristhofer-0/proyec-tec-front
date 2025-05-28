@@ -46,7 +46,7 @@ export async function obtenerHistorialDeOrdenes(): Promise<OrderMapped[] | null>
       price: orden.price,
       type: orden.type,
       date: orden.date,
-    }));
+    })).reverse(); 
 
     return ordenesMapeadas;
   } catch (error) {

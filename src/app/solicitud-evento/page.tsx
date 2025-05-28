@@ -101,7 +101,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       </div>
 
     <div className="container mx-auto py-10 px-4">
-      <Card className="max-w-2xl mx-auto">
+      <Card className="max-w-2xl mx-auto bg-gradient-to-b from-blue-50 to-indigo-100">
         <CardHeader>
           <CardTitle className="text-2xl">Complete el formulario</CardTitle>
           <CardDescription>Complete el formulario con sus datos para solicitar un cambio de rol.</CardDescription>

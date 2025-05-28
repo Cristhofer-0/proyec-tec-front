@@ -1,11 +1,11 @@
 // services/payment.ts
 import type { Stripe } from '@stripe/stripe-js';
-
+import { API_BASE_URL } from "@/lib/config"
 
 
 export const eliminarProducto = async (orderId: number) => {
   try {
-    const response = await fetch('http://localhost:3000/orders/eliminar', {
+    const response = await fetch(`${API_BASE_URL}/orders/eliminar`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ orderId }),
@@ -29,7 +29,7 @@ export const eliminarProducto = async (orderId: number) => {
 
 export const iniciarPago = async (stripePromise: Promise<Stripe | null>) => {
   try {
-    const response = await fetch('http://localhost:3000/createSessionFromPendingOrders', {
+    const response = await fetch(`${API_BASE_URL}/createSessionFromPendingOrders`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

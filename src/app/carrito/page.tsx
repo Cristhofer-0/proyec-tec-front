@@ -82,7 +82,7 @@ export default function CartPage() {
         toast(data);
       }, 100);
 
-      router.replace("/carrito");
+      router.replace("/usuario/perfil");
     }
   }, [status, router]);
 
@@ -116,7 +116,7 @@ export default function CartPage() {
                           variant="ghost"
                           size="icon"
                           className="absolute right-0 top-0 text-muted-foreground hover:text-destructive z-10"
-                          aria-label={`Eliminar ${item.title} del carrito`}
+                          aria-label={`Eliminar S/ {item.title} del carrito`}
                           onClick={() => handleEliminarProducto(item.id)}
                         >
                           <svg
@@ -148,7 +148,7 @@ export default function CartPage() {
                             <div className="flex items-center gap-2">
                               <h3 className="text-lg font-semibold">{item.title}</h3>
                               <span
-                                className={`text-xs px-2 py-1 rounded-full ${item.type === "VIP" ? "bg-amber-100 text-amber-800" : "bg-gray-100 text-gray-800"}`}
+                                className={`text-xs px-2 py-1 rounded-full S/ {item.type === "VIP" ? "bg-amber-100 text-amber-800" : "bg-gray-100 text-gray-800"}`}
                               >
                                 {item.type}
                               </span>
@@ -199,14 +199,14 @@ export default function CartPage() {
                     <span className="text-muted-foreground">
                       {item.title} - {item.type} ({item.quantity})
                     </span>
-                    <span>${(item.price * item.quantity).toFixed(2)}</span>
+                    <span>S/ {(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
               <Separator className="my-4" />
               <div className="flex justify-between font-semibold text-lg">
                 <span>Total</span>
-                <span>${producto.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}</span>
+                <span>S/ {producto.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}</span>
               </div>
               <Button className="w-full mt-6" onClick={handlePagar} >Proceder al pago</Button>
               <Button variant="outline" className="w-full mt-2" asChild>
