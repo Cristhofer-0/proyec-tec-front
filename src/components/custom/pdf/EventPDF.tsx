@@ -102,6 +102,7 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni 
               <Text style={styles.label}>DNI:</Text>
               <Text style={styles.text}>{dni}</Text>
             </View>
+            <Text> </Text>
 
             {/* Más contenido del PDF aquí... */}
             <View style={styles.section}>
@@ -147,8 +148,6 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni 
               </View>
             </View>
           )}
-
-          {/* <View style={styles.divider} /> */}
 
           {/* Description */}
           {descripcion && (
