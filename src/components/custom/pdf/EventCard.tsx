@@ -10,14 +10,14 @@ export default function EventCard({ evento }: { evento: any }) {
   return (
     <div className="space-y-6 bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-lg">
       {/* Imagen del evento */}
-      <div className="relative h-48 w-full rounded-lg overflow-hidden">
+      {/* <div className="relative h-48 w-full rounded-lg overflow-hidden">
         <Image
           src={evento.BannerUrl || "/placeholder.svg?height=200&width=400"}
           alt={evento.Title || "Imagen del evento"}
           fill
           className="object-cover"
         />
-      </div>
+      </div> */}
 
       {/* Título */}
       <h2 className="text-2xl font-bold text-purple-600">{evento.Title}</h2>

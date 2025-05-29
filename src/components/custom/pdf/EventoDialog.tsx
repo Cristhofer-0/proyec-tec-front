@@ -7,9 +7,8 @@ import EventCard from "@/components/custom/pdf/EventCard"
 import { useEffect, useState } from "react"
 import { generarPDF } from "@/services/generarPDF"
 import { PDFDownloadLink } from '@react-pdf/renderer'
-// import { EventoPDF } from '@/components/custom/pdf/EventoPDF'
-// Update the import path below to match the actual file location and name, e.g.:
 import { EventoPDF } from './EventPDF'
+import { generarQRBase64 } from '../../types/generarQR'
 
 
 type Evento = {
@@ -28,6 +27,20 @@ type Evento = {
 export default function EventoDialog({ id }: { id: string }) {
   const [orden, setOrden] = useState<any | null>(null)
   const [evento, setEvento] = useState<Evento | null>(null)
+  const [qrBase64, setQrBase64] = useState<string | null>(null)
+
+  useEffect(() => {
+  if (!orden) return
+  const generar = async () => {
+    const qr = await generarQRBase64({
+      OrderId: orden.id,
+      Evento: orden.Event?.Title,
+      Dirección: orden.Event?.Address,
+    })
+    setQrBase64(qr)
+  }
+  generar()
+}, [orden])
 
   useEffect(() => {
     const fetchEvento = async () => {
@@ -79,7 +92,7 @@ export default function EventoDialog({ id }: { id: string }) {
         
         {evento ? (
           <PDFDownloadLink
-            document={<EventoPDF evento={normalizarEvento(evento)} />}
+            document={<EventoPDF evento={normalizarEvento(evento)} qrBase64={qrBase64 || ''} />}
             fileName={`evento-${evento.EventId}-detalles.pdf`}
           >
             {({ loading }) => (
