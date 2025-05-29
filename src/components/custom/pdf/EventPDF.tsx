@@ -46,7 +46,7 @@ const formatFecha = (fecha: string) => {
 }
 
 
-export const EventoPDF = ({ evento, qrBase64 }: { evento: Evento, qrBase64?: string }) => {
+export const EventoPDF = ({ evento, qrBase64, orderDate }: { evento: Evento, qrBase64?: string, orderDate?: string }) => {
   console.log('Evento en PDF:', evento); 
   const {
     id = '',
@@ -117,12 +117,20 @@ export const EventoPDF = ({ evento, qrBase64 }: { evento: Evento, qrBase64?: str
             <Text style={styles.text}>{organizador}</Text>
           </View>
         )}
+        
+        {orderDate && (
+          <View style={styles.section}>
+            <Text style={styles.label}>Fecha de Orden:</Text>
+            <Text style={styles.text}>{formatFecha(orderDate)}</Text>
+          </View>
+        )}
         {qrBase64 && (
           <View style={styles.section}>
             <Text style={styles.label}>Código QR:</Text>
             <Image src={qrBase64} style={{ width: 100, height: 100 }} />
           </View>
         )}
+        
         <View style={styles.section}>
           <Text style={{ color: 'gray', fontSize: 10 }}>
             Generado el {new Date().toLocaleDateString("es-ES")} a las {new Date().toLocaleTimeString("es-ES")}

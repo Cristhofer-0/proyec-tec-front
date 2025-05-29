@@ -34,8 +34,12 @@ export default function EventoDialog({ id }: { id: string }) {
   const generar = async () => {
     const qr = await generarQRBase64({
       OrderId: orden.id,
+      EventoId: orden.Event?.EventId,
+      Fecha: orden.OrderDate,
+      EstadoPago: orden.PaymentStatus,
       Evento: orden.Event?.Title,
       Dirección: orden.Event?.Address,
+      Precio: orden.Ticket?.Price,
     })
     setQrBase64(qr)
   }
