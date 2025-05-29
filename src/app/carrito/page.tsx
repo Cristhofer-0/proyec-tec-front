@@ -87,7 +87,7 @@ export default function CartPage() {
   }, [status, router]);
 
   return (
-    <div className="container mx-auto py-10 px-4">
+    <div className="container mx-auto py-12 px-4 min-h-screen">
       <div className="flex items-center gap-2 mb-6">
         <ShoppingBag className="h-6 w-6" />
         <h1 className="text-3xl font-bold">Mi Carrito</h1>

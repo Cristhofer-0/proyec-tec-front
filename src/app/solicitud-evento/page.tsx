@@ -86,7 +86,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
 
   return (
-    <div className="container mx-auto py-10 px-4">
+    <div className="container mx-auto py-12 px-4 min-h-screen">
       {/* Contenedor centrado con ancho mayor que el formulario */}
       <div className="max-w-5xl mx-auto mb-8 p-8 bg-gradient-to-r from-blue-600 to-indigo-700 text-white rounded-lg shadow-lg text-center">
         <h1 className="text-4xl font-extrabold mb-4">

@@ -158,20 +158,7 @@ export default function Login() {
             </div>
 
             {/* RECORDAR Y OLVIDAR */}
-            <div className="flex items-center justify-between mt-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox id="remember" />
-                <label
-                  htmlFor="remember"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Recuérdame
-                </label>
-              </div>
-              <Link href="/recuperar-password" className="text-sm font-medium text-purple-600 hover:underline">
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </div>
+            
 
             <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
               Iniciar sesión

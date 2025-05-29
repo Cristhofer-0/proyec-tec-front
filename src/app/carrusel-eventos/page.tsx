@@ -61,7 +61,7 @@ export default function Eventos() {
               <div className="w-full h-full bg-gray-200" />
             )}
 
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-900/70 to-pink-600/50 flex items-center">
+            <div className="absolute inset-0 flex items-center">
               <div className="container px-4 md:px-6">
                 <div className="max-w-xl space-y-4">
                   <div className="space-y-2">
