@@ -30,7 +30,7 @@ export default function EventoDialog({ id }: { id: string }) {
 
   useEffect(() => {
     const fetchEvento = async () => {
-      const res = await fetch(`http://localhost:3000/eventos/${id}`)
+      const res = await fetch(`http://localhost:3000/orders/${id}`)
       if (res.ok) {
         const data = await res.json()
         setEvento(data)
