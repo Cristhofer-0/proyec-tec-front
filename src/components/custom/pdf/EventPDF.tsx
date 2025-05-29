@@ -23,13 +23,16 @@ interface Evento {
   organizador?: string
 }
 
-const formatFecha = (fecha: string) => {
+const formatFecha = (fecha: string, usarUTC = false) => {
   if (!fecha) return "Fecha no disponible"
   const d = new Date(fecha)
   if (isNaN(d.getTime())) return "Fecha inválida"
 
   const pad = (n: number) => (n < 10 ? "0" + n : n)
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+
+  return usarUTC
+    ? `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`
+    : `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
 export const EventoPDF = ({ evento, qrBase64, orderId, orderDate,  quantity }: { evento: Evento; qrBase64?: string, orderId?: number, orderDate?: string,  quantity?: number }) => {
@@ -71,7 +74,7 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate,  quantity }: {
 
             <View style={styles.eventIdBox}>
               <Text style={styles.eventIdLabel}>Fecha de la Orden</Text>
-              <Text style={styles.eventIdText}>{formatFecha(orderDate)}</Text>
+              <Text style={styles.eventIdText}>{formatFecha(orderDate || "", true)}</Text>
             </View>
             </View>
           )}
