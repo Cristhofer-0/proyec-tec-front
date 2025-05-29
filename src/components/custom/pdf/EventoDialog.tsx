@@ -5,7 +5,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Button } from "@/components/ui/button"
 import EventCard from "@/components/custom/pdf/EventCard"
 import { useEffect, useState } from "react"
-import { generarPDF } from "@/services/generarPDF"
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import { EventoPDF } from './EventPDF'
 import { generarQRBase64 } from '../../types/generarQR'
@@ -33,7 +32,7 @@ export default function EventoDialog({ id }: { id: string }) {
   if (!orden) return
   const generar = async () => {
     const qr = await generarQRBase64({
-      OrderId: orden.id,
+      OrderId: orden.OrderId,
       EventoId: orden.Event?.EventId,
       Fecha: orden.OrderDate,
       EstadoPago: orden.PaymentStatus,
@@ -96,8 +95,12 @@ export default function EventoDialog({ id }: { id: string }) {
         
         {evento ? (
           <PDFDownloadLink
-            document={<EventoPDF evento={normalizarEvento(evento)} qrBase64={qrBase64 || ''} />}
-            fileName={`evento-${evento.EventId}-detalles.pdf`}
+            document={<EventoPDF 
+              evento={normalizarEvento(evento)} 
+              qrBase64={qrBase64 || ''} 
+              orderId={orden?.OrderId}
+              orderDate={orden?.OrderDate}/>}
+            fileName={`Factura-de-la-orden-${orden.OrderId}.pdf`}
           >
             {({ loading }) => (
               <Button className="bg-purple-600 text-white hover:bg-purple-700">
