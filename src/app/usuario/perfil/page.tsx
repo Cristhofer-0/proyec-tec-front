@@ -24,8 +24,10 @@ import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { validarSesion, cerrarSesion as cerrarSesionService } from "@/services/usuarios"
 import { obtenerHistorialDeOrdenes } from "@/services/ordenes";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 
 import { OrderMapped } from "@/components/types/carrito"
+import EventoDialog from "@/components/custom/pdf/EventoDialog"
 
 export default function ProfilePage() {
   const [activeSection, setActiveSection] = useState("account")
@@ -238,13 +240,11 @@ useEffect(() => {
                               Cantidad: {item.quantity} - Precio total: S/{item.totalPrice}
                             </p>
                           </div>
+                          <Dialog >
+                            <EventoDialog id={item.id.toString()}></EventoDialog>
+                          </Dialog>
                         </div>
-
-                        <div className="mt-4 flex justify-end">
-                          <Button variant="outline" size="sm">
-                            Ver detalles
-                          </Button>
-                        </div>
+                          
                       </div>
                     ))
                   )}
