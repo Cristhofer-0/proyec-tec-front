@@ -32,7 +32,7 @@ const formatFecha = (fecha: string) => {
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-export const EventoPDF = ({ evento, qrBase64, orderId, orderDate }: { evento: Evento; qrBase64?: string, orderId?: number, orderDate?: string }) => {
+export const EventoPDF = ({ evento, qrBase64, orderId, orderDate,  quantity }: { evento: Evento; qrBase64?: string, orderId?: number, orderDate?: string,  quantity?: number }) => {
   const {
     id = "",
     titulo = "",
@@ -94,6 +94,13 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate }: { evento: Ev
               <Text style={styles.label}>Fecha de Inicio:</Text>
               <Text style={styles.text}>{formatFecha(fechaInicio)}</Text>
             </View>
+            
+        {quantity !== undefined && (
+          <View style={styles.section}>
+            <Text style={styles.label}>Cantidad de Entradas:</Text>
+            <Text style={styles.text}>{quantity}</Text>
+          </View>
+        )}
 
             <View style={styles.section}>
               <Text style={styles.label}>Fecha de Fin:</Text>
