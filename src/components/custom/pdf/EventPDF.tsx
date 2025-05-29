@@ -36,7 +36,7 @@ const formatFecha = (fecha: string, usarUTC = false) => {
     : `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-export const EventoPDF = ({ evento, qrBase64, orderId, orderDate,  quantity }: { evento: Evento; qrBase64?: string, orderId?: number, orderDate?: string,  quantity?: number }) => {
+export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni }: { evento: Evento; qrBase64?: string, orderId?: number, orderDate?: string,fullName?: string, dni?: string }) => {
   const {
     id = "",
     titulo = "",
@@ -97,17 +97,22 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate,  quantity }: {
 
           {/* Main Info Box */}
           <View style={styles.infoBox}>
+            {/* Información del usuario */}
+            <View style={styles.section}>
+              <Text style={styles.label}>Nombre completo:</Text>
+              <Text style={styles.text}>{fullName}</Text>
+            </View>
+            <View style={styles.section}>
+              <Text style={styles.label}>DNI:</Text>
+              <Text style={styles.text}>{dni}</Text>
+            </View>
+            <Text> </Text>
+
+            {/* Más contenido del PDF aquí... */}
             <View style={styles.section}>
               <Text style={styles.label}>Fecha de Inicio:</Text>
               <Text style={styles.text}>{formatFecha(fechaInicio)}</Text>
             </View>
-            
-        {quantity !== undefined && (
-          <View style={styles.section}>
-            <Text style={styles.label}>Cantidad de Entradas:</Text>
-            <Text style={styles.text}>{quantity}</Text>
-          </View>
-        )}
 
             <View style={styles.section}>
               <Text style={styles.label}>Fecha de Fin:</Text>
@@ -147,8 +152,6 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate,  quantity }: {
               </View>
             </View>
           )}
-
-          <View style={styles.divider} />
 
           {/* Description */}
           {descripcion && (
