@@ -1,14 +1,17 @@
+//EventoPage.tsx
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import EventCard from "@/components/custom/pdf/EventCard"
 import { notFound } from "next/navigation"
 
 export default async function EventoPage({ params }: { params: { id: string } }) {
-  const res = await fetch(`http://localhost:3000/orders/${params.id}`) // Lado servidor
+  const res = await fetch(`http://localhost:3000/orders/${params.id}`)
 
   if (!res.ok) return notFound()
 
-  const event = await res.json()
+  const data = await res.json()
+  console.log(data)
+  const event = data // <- Extraer el evento anidado
 
   return (
     <div className="p-6">

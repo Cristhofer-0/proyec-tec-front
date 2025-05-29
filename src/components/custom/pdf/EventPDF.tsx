@@ -36,16 +36,18 @@ const styles = StyleSheet.create({
   },
 })
 
-const formatFecha = (fecha: string) =>
-  new Date(fecha).toLocaleString("es-ES", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  })
+const formatFecha = (fecha: string) => {
+  if (!fecha) return 'Fecha no disponible';
+  const d = new Date(fecha)
+  if (isNaN(d.getTime())) return 'Fecha inválida'
+
+  const pad = (n: number) => (n < 10 ? '0' + n : n)
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
 
 export const EventoPDF = ({ evento }: { evento: Evento }) => {
+  console.log('Evento en PDF:', evento); 
   const {
     id = '',
     titulo = '',
@@ -57,6 +59,7 @@ export const EventoPDF = ({ evento }: { evento: Evento }) => {
     precio,
     organizador,
   } = evento;
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>

@@ -1,3 +1,4 @@
+//EventCard.tsx
 "use client"
 
 import Image from "next/image"
@@ -12,7 +13,7 @@ export default function EventCard({ evento }: { evento: any }) {
       <div className="relative h-48 w-full rounded-lg overflow-hidden">
         <Image
           src={evento.BannerUrl || "/placeholder.svg?height=200&width=400"}
-          alt={evento.Title}
+          alt={evento.Title || "Imagen del evento"}
           fill
           className="object-cover"
         />

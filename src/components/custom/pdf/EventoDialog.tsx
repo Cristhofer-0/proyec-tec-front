@@ -1,7 +1,7 @@
 // components/custom/EventoDialog.tsx
 'use client'
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import EventCard from "@/components/custom/pdf/EventCard"
 import { useEffect, useState } from "react"
@@ -26,6 +26,7 @@ type Evento = {
 };
 
 export default function EventoDialog({ id }: { id: string }) {
+  const [orden, setOrden] = useState<any | null>(null)
   const [evento, setEvento] = useState<Evento | null>(null)
 
   useEffect(() => {
@@ -33,7 +34,8 @@ export default function EventoDialog({ id }: { id: string }) {
       const res = await fetch(`http://localhost:3000/orders/${id}`)
       if (res.ok) {
         const data = await res.json()
-        setEvento(data)
+        setOrden(data)
+        setEvento(data.Event)
       }
     }
     fetchEvento()
@@ -41,6 +43,20 @@ export default function EventoDialog({ id }: { id: string }) {
 
   if (!evento) return null
 
+  const normalizarEvento = (eventoOriginal: any): Evento => ({
+      id: String(eventoOriginal.EventId),
+      titulo: eventoOriginal.Title,
+      categorias: typeof eventoOriginal.Categories === 'string'
+        ? eventoOriginal.Categories.split(',').map((c: string) => c.trim())
+        : [],
+      fechaInicio: eventoOriginal.StartDate,
+      fechaFinalizacion: eventoOriginal.EndDate,
+      direccion: eventoOriginal.Address,
+      descripcion: eventoOriginal.Description,
+      precio: eventoOriginal.Price,
+      organizador: eventoOriginal.OrganizerName || eventoOriginal.organizador || '',
+    })
+    
   return (
     <Dialog>
       <div className="mt-4 flex justify-end">
@@ -52,24 +68,28 @@ export default function EventoDialog({ id }: { id: string }) {
       <DialogContent className="overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border-0 bg-white">
         <DialogHeader>
           <DialogTitle>Detalles del evento</DialogTitle>
+          <DialogDescription>
+            Información detallada del evento, incluyendo fecha, ubicación y más.
+          </DialogDescription>
         </DialogHeader>
         <EventCard evento={evento} />
         {/* <Button onClick={() => generarPDF(evento)} className="bg-purple-600 text-white hover:bg-purple-700">
             Descargar PDF
         </Button> */}
+        
         {evento ? (
-            <PDFDownloadLink
-                document={<EventoPDF evento={evento} />}
-                fileName={`evento-${evento.id}-detalles.pdf`}
-            >
-                {({ loading }) => (
-                <Button className="bg-purple-600 text-white hover:bg-purple-700">
-                    {loading ? 'Generando PDF...' : 'Descargar PDF'}
-                </Button>
-                )}
-            </PDFDownloadLink>
-            ) : (
-            <p className="text-sm text-gray-500">Cargando PDF…</p>
+          <PDFDownloadLink
+            document={<EventoPDF evento={normalizarEvento(evento)} />}
+            fileName={`evento-${evento.EventId}-detalles.pdf`}
+          >
+            {({ loading }) => (
+              <Button className="bg-purple-600 text-white hover:bg-purple-700">
+                {loading ? 'Generando PDF...' : 'Descargar PDF'}
+              </Button>
+            )}
+          </PDFDownloadLink>
+        ) : (
+          <p className="text-sm text-gray-500">Cargando PDF…</p>
         )}
 
         
