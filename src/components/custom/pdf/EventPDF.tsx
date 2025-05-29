@@ -1,6 +1,6 @@
 import { Document, Page, Text, View, Image } from "@react-pdf/renderer"
 import { styles } from "../../types/styles"
-import logo from "../../../../public/images/logo-joinwithus.png"  
+import logo from "../../../../public/images/logo-joinwithus.png"
 
 // Register fonts (optional - you would need to provide these font files)
 // Font.register({
@@ -36,7 +36,7 @@ const formatFecha = (fecha: string, usarUTC = false) => {
     : `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni }: { evento: Evento; qrBase64?: string, orderId?: number, orderDate?: string,fullName?: string, dni?: string }) => {
+export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni, quantity }: { evento: Evento; qrBase64?: string, orderId?: number, orderDate?: string, fullName?: string, dni?: string, quantity?: number }) => {
   const {
     id = "",
     titulo = "",
@@ -54,15 +54,15 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni 
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Header */}
-<View style={styles.header}>
-  <Image src="/images/logonew.png" style={styles.logo} />
-  <View style={styles.headerTextContainer}>
-    <Text style={styles.headerTitle}>{titulo}</Text>
-    <Text style={styles.headerSubtitle}>
-      {formatFecha(fechaInicio)} - {formatFecha(fechaFinalizacion)}
-    </Text>
-  </View>
-</View>
+        <View style={styles.header}>
+          <Image src="/images/logonew.png" style={styles.logo} />
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.headerTitle}>{titulo}</Text>
+            <Text style={styles.headerSubtitle}>
+              {formatFecha(fechaInicio)} - {formatFecha(fechaFinalizacion)}
+            </Text>
+          </View>
+        </View>
 
         {orderId && (
           <View style={styles.content}>
@@ -73,15 +73,15 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni 
           </View>
         )}
 
-          {orderDate && (
-            <View style={styles.content}>
+        {orderDate && (
+          <View style={styles.content}>
 
             <View style={styles.eventIdBox}>
               <Text style={styles.eventIdLabel}>Fecha de la Orden</Text>
               <Text style={styles.eventIdText}>{formatFecha(orderDate || "", true)}</Text>
             </View>
-            </View>
-          )}
+          </View>
+        )}
 
         {/* Event ID */}
         <View style={styles.content}>
@@ -106,7 +106,12 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni 
               <Text style={styles.label}>DNI:</Text>
               <Text style={styles.text}>{dni}</Text>
             </View>
-            <Text> </Text>
+            {quantity !== undefined && (
+              <View style={styles.section}>
+                <Text style={styles.label}>Cantidad de Entradas:</Text>
+                <Text style={styles.text}>{quantity}</Text>
+              </View>
+            )}
 
             {/* Más contenido del PDF aquí... */}
             <View style={styles.section}>

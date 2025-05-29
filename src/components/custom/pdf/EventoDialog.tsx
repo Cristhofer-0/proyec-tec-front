@@ -105,6 +105,7 @@ export default function EventoDialog({ id }: { id: string }) {
               orderDate={orden?.OrderDate}
               fullName={orden?.User?.FullName}
               dni={orden?.User?.DNI}
+              quantity={orden?.Quantity}
             />}
             fileName={`Factura-de-la-orden-${orden.OrderId}.pdf`}
           >

@@ -116,7 +116,7 @@ headerTextContainer: {
   },
   infoBox: {
     backgroundColor: "#f3e8ff",
-    padding: 15,
+    padding: 10,
     borderRadius: 5,
     marginBottom: 15,
     borderLeft: "4px solid #9333ea",
