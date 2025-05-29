@@ -4,7 +4,7 @@ import EventCard from "@/components/custom/pdf/EventCard"
 import { notFound } from "next/navigation"
 
 export default async function EventoPage({ params }: { params: { id: string } }) {
-  const res = await fetch(`http://localhost:3000/api/eventos/${params.id}`) // Lado servidor
+  const res = await fetch(`http://localhost:3000/orders/${params.id}`) // Lado servidor
 
   if (!res.ok) return notFound()
 
