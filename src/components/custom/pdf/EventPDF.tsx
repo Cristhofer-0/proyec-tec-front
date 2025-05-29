@@ -35,7 +35,7 @@ const formatFecha = (fecha: string, usarUTC = false) => {
     : `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-export const EventoPDF = ({ evento, qrBase64, orderId, orderDate }: { evento: Evento; qrBase64?: string, orderId?: number, orderDate?: string }) => {
+export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni }: { evento: Evento; qrBase64?: string, orderId?: number, orderDate?: string,fullName?: string, dni?: string }) => {
   const {
     id = "",
     titulo = "",
@@ -93,6 +93,17 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate }: { evento: Ev
 
           {/* Main Info Box */}
           <View style={styles.infoBox}>
+            {/* Información del usuario */}
+            <View style={styles.section}>
+              <Text style={styles.label}>Nombre completo:</Text>
+              <Text style={styles.text}>{fullName}</Text>
+            </View>
+            <View style={styles.section}>
+              <Text style={styles.label}>DNI:</Text>
+              <Text style={styles.text}>{dni}</Text>
+            </View>
+
+            {/* Más contenido del PDF aquí... */}
             <View style={styles.section}>
               <Text style={styles.label}>Fecha de Inicio:</Text>
               <Text style={styles.text}>{formatFecha(fechaInicio)}</Text>
@@ -137,7 +148,7 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate }: { evento: Ev
             </View>
           )}
 
-          <View style={styles.divider} />
+          {/* <View style={styles.divider} /> */}
 
           {/* Description */}
           {descripcion && (

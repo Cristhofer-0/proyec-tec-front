@@ -39,6 +39,8 @@ export default function EventoDialog({ id }: { id: string }) {
       Evento: orden.Event?.Title,
       Dirección: orden.Event?.Address,
       Precio: orden.Ticket?.Price,
+      Usuario: orden.User?.FullName,
+      Dni: orden.User?.DNI,
     })
     setQrBase64(qr)
   }
@@ -99,7 +101,10 @@ export default function EventoDialog({ id }: { id: string }) {
               evento={normalizarEvento(evento)} 
               qrBase64={qrBase64 || ''} 
               orderId={orden?.OrderId}
-              orderDate={orden?.OrderDate}/>}
+              orderDate={orden?.OrderDate}
+              fullName={orden?.User?.FullName}
+              dni={orden?.User?.DNI}
+            />}
             fileName={`Factura-de-la-orden-${orden.OrderId}.pdf`}
           >
             {({ loading }) => (
