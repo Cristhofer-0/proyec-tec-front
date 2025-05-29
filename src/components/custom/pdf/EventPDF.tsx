@@ -1,5 +1,6 @@
 import { Document, Page, Text, View, Image } from "@react-pdf/renderer"
 import { styles } from "../../types/styles"
+import logo from "../../../../public/images/logo-joinwithus.png"  
 
 // Register fonts (optional - you would need to provide these font files)
 // Font.register({
@@ -53,12 +54,15 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate,  quantity }: {
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>{titulo}</Text>
-          <Text style={styles.headerSubtitle}>
-            {formatFecha(fechaInicio)} - {formatFecha(fechaFinalizacion)}
-          </Text>
-        </View>
+<View style={styles.header}>
+  <Image src="/images/logonew.png" style={styles.logo} />
+  <View style={styles.headerTextContainer}>
+    <Text style={styles.headerTitle}>{titulo}</Text>
+    <Text style={styles.headerSubtitle}>
+      {formatFecha(fechaInicio)} - {formatFecha(fechaFinalizacion)}
+    </Text>
+  </View>
+</View>
 
         {orderId && (
           <View style={styles.content}>

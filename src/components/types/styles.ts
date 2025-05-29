@@ -7,12 +7,25 @@ export const styles = StyleSheet.create({
     fontFamily: "Helvetica",
     color: "#333",
   },
-  header: {
-    backgroundColor: "#9333ea",
-    padding: 30,
-    paddingBottom: 20,
-    marginBottom: 20,
-  },
+header: {
+  backgroundColor: "#9333ea", // el color ajustado más suave
+  padding: 20,
+  paddingBottom: 15,
+  marginBottom: 20,
+  flexDirection: "row", // Esto hace que el logo y el texto estén en fila
+  alignItems: "center", // Centra verticalmente
+  gap: 10, // Espacio entre logo y texto (opcional)
+},
+
+logo: {
+  width: 60, // Ajusta el tamaño como prefieras
+  height: 60,
+  marginRight: 10, // Un pequeño margen entre el logo y el texto (opcional si usas gap)
+},
+
+headerTextContainer: {
+  flex: 1, // El texto ocupa el resto del espacio
+},
   headerTitle: {
     color: "white",
     fontSize: 24,
