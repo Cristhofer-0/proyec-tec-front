@@ -11,14 +11,17 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { formatearFecha } from "@/components/types/Fechas"
 import type { ItemData } from "@/components/types/ItemData"
+import { useEventosFiltrados } from "@/components/hooks/useEventosFiltrados"
+
 
 export default function EventosPage() {
-  const [eventos, setEventos] = useState<ItemData[]>([])
+  const { eventos, isLoading, error } = useEventosFiltrados()
+  //const [eventos, setEventos] = useState<ItemData[]>([])
   const [filteredEventos, setFilteredEventos] = useState<ItemData[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState("all")
   const [categorias, setCategorias] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  //const [isLoading, setIsLoading] = useState(true)
 
   // Función para normalizar texto
   function normalizeText(text: string) {
@@ -33,9 +36,9 @@ export default function EventosPage() {
     async function loadEventos() {
       try {
         const data = await fetchEventos()
-        setEventos(data)
+        //setEventos(data)
         setFilteredEventos(data)
-        setIsLoading(false)
+        //setIsLoading(false)
 
         const categoriasMap = new Map()
 
@@ -54,7 +57,7 @@ export default function EventosPage() {
         setCategorias(Array.from(categoriasMap.values()))
       } catch (error) {
         console.error("Error fetching eventos:", error)
-        setIsLoading(false)
+        //setIsLoading(false)
       }
     }
 

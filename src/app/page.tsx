@@ -27,6 +27,11 @@ import { formatearFecha } from "@/components/types/Fechas"
 export default async function Home() {
   const eventos = await fetchEventos()
 
+    const eventosFiltrados = eventos.filter(
+    (evento) => evento.estado?.toLowerCase() === "published"
+  );
+
+
   return (
     <main className="flex-1">
       <Eventos  />
@@ -44,7 +49,7 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            {eventos.slice(0, 3).map((evento, index) => (
+            {eventosFiltrados.slice(0, 3).map((evento, index) => (
               <Card key={index} className="overflow-hidden border-none shadow-lg">
                 <div className="relative h-48">
                   <Image
