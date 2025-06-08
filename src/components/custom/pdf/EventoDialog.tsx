@@ -38,6 +38,7 @@ export default function EventoDialog({ id }: { id: string }) {
       EstadoPago: orden.PaymentStatus,
       Evento: orden.Event?.Title,
       Dirección: orden.Event?.Address,
+      Tipo: orden.Ticket?.Type,
       Cantidad: orden.Quantity,
       Precio: orden.Ticket?.Price,
       Usuario: orden.User?.FullName,

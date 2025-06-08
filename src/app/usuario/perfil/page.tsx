@@ -30,7 +30,7 @@ import { OrderMapped } from "@/components/types/carrito"
 import EventoDialog from "@/components/custom/pdf/EventoDialog"
 
 export default function ProfilePage() {
-  const [activeSection, setActiveSection] = useState("account")
+  const [activeSection, setActiveSection] = useState("purchases");
   const [comprados, setComprados] = useState<OrderMapped[]>([]);
   const router = useRouter()
 const [usuario, setUsuario] = useState<{ fullName: string; email: string } | null>(null);
