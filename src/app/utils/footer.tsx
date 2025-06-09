@@ -47,8 +47,8 @@ const Footer: React.FC = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Blog
+                  <Link href="/ayuda" className="hover:text-white transition-colors">
+                    Ayuda
                   </Link>
                 </li>
                 <li>
@@ -68,7 +68,7 @@ const Footer: React.FC = () => {
               <ul className="space-y-2">
                 <li>info@joinwithus.com</li>
                 <li>+51 912 345 678</li>
-                <li>Calle Esmeralda, Lima</li>
+                <li>Calle Esmeralda 123, Lima</li>
               </ul>
             </div>
           </div>

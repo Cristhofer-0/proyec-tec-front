@@ -49,8 +49,8 @@ const Header: React.FC = () => {
             Eventos
           </Link>
           <Link href="/solicitud-evento">Solicitud</Link>
-          <Link href="#" className="font-medium transition-colors hover:text-primary">
-            Contacto
+          <Link href="/ayuda" className="font-medium transition-colors hover:text-primary">
+            Ayuda
           </Link>
         </nav>
         <div className="flex items-center gap-4">
