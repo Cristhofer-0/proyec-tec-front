@@ -180,7 +180,7 @@ export default function Login() {
             </div>
             <div className="text-center text-sm">
               ¿No tienes una cuenta?{" "}
-              <Link href="/registro" className="font-medium text-purple-600 hover:underline">
+              <Link href="/usuario/register" className="font-medium text-purple-600 hover:underline">
                 Regístrate
               </Link>
             </div>

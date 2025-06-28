@@ -133,46 +133,6 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Testimonios */}
-      <section className="py-12 bg-gradient-to-b from-purple-50 to-white">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                Lo que dicen nuestros clientes
-              </h2>
-              <p className="max-w-[700px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                Miles de personas han confiado en nosotros para sus eventos
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            {[1, 2, 3].map((item) => (
-              <Card key={item} className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="h-5 w-5 fill-yellow-500 text-yellow-500" />
-                  ))}
-                </div>
-                <p className="text-gray-600 mb-4">
-                  "Increíble servicio. Organizaron mi boda a la perfección y todos los invitados quedaron encantados.
-                  Definitivamente los recomendaré a todos mis amigos."
-                </p>
-                <div className="flex items-center gap-4">
-                  <div className="relative h-12 w-12 rounded-full overflow-hidden">
-                    <Image src="/placeholder.svg?height=50&width=50" alt="Avatar" fill className="object-cover" />
-                  </div>
-                  <div>
-                    <h4 className="font-semibold">María García</h4>
-                    <p className="text-sm text-gray-500">Boda en Madrid</p>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA */}
       <section className="py-12 bg-gradient-to-r from-purple-600 to-pink-500 text-white">
         <div className="container px-4 md:px-6">

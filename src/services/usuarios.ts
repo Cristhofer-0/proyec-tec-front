@@ -1,3 +1,4 @@
+import { UsuarioData } from "@/components/types/UsuarioData";
 import { API_BASE_URL } from "@/lib/config"
 
 
@@ -50,5 +51,27 @@ export async function cerrarSesion(): Promise<boolean> {
   } catch (error) {
     console.error("Error en logout:", error);
     return false;
+  }
+}
+
+export async function registerUser(data: UsuarioData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/usuarios/registrar`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+
+    const result = await response.json()
+
+    if (!response.ok) {
+      throw new Error(result.message || "Error al registrar el usuario.")
+    }
+
+    return result
+  } catch (error: any) {
+    throw new Error(error.message || "Error desconocido")
   }
 }
