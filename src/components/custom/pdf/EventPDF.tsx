@@ -24,16 +24,19 @@ interface Evento {
   organizador?: string
 }
 
-const formatFecha = (fecha: string, usarUTC = false) => {
-  if (!fecha) return "Fecha no disponible"
-  const d = new Date(fecha)
-  if (isNaN(d.getTime())) return "Fecha inválida"
+function formatFecha(fechaIso: string, incluirHora = false): string {
+  if (!fechaIso) return "Fecha no disponible"
 
-  const pad = (n: number) => (n < 10 ? "0" + n : n)
+  const [fecha, tiempo] = fechaIso.split("T") // "2025-07-26", "00:00:00.000Z"
+  const [anio, mes, dia] = fecha.split("-")
 
-  return usarUTC
-    ? `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`
-    : `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+  if (!incluirHora || !tiempo) {
+    return `${dia}/${mes}/${anio}`
+  }
+
+  const [hora, minuto] = tiempo.split(":") // Ignoramos segundos y milisegundos
+
+  return `${dia}/${mes}/${anio} ${hora}:${minuto}`
 }
 
 export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni, quantity }: { evento: Evento; qrBase64?: string, orderId?: number, orderDate?: string, fullName?: string, dni?: string, quantity?: number }) => {
@@ -116,12 +119,12 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni,
             {/* Más contenido del PDF aquí... */}
             <View style={styles.section}>
               <Text style={styles.label}>Fecha de Inicio:</Text>
-              <Text style={styles.text}>{formatFecha(fechaInicio)}</Text>
+             <Text style={styles.text}>{formatFecha(fechaInicio, true)}</Text>
             </View>
 
             <View style={styles.section}>
               <Text style={styles.label}>Fecha de Fin:</Text>
-              <Text style={styles.text}>{formatFecha(fechaFinalizacion)}</Text>
+              <Text style={styles.text}>{formatFecha(fechaFinalizacion, true)}</Text>
             </View>
 
             <View style={styles.section}>

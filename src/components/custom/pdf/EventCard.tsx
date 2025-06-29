@@ -7,6 +7,10 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 
 export default function EventCard({ evento }: { evento: any }) {
+function formatearFechaUTC(utcString: string) {
+  return utcString.slice(0, 10).split("-").reverse().join("/") // "2025/07/26"
+}
+
   return (
     <div className="space-y-6 bg-white dark:bg-zinc-900 p-6 rounded-xl shadow-lg">
       {/* Imagen del evento */}
@@ -37,7 +41,7 @@ export default function EventCard({ evento }: { evento: any }) {
             <div>
               <p className="font-semibold text-gray-900 dark:text-gray-100">Fecha de Inicio</p>
               <p className="text-gray-600 dark:text-gray-400">
-                {new Date(evento.StartDate).toLocaleString()}
+                 {formatearFechaUTC(evento.StartDate)}
               </p>
             </div>
           </div>
@@ -47,7 +51,7 @@ export default function EventCard({ evento }: { evento: any }) {
             <div>
               <p className="font-semibold text-gray-900 dark:text-gray-100">Fecha de Finalización</p>
               <p className="text-gray-600 dark:text-gray-400">
-                {new Date(evento.EndDate).toLocaleString()}
+                {formatearFechaUTC(evento.EndDate)}
               </p>
             </div>
           </div>

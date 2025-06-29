@@ -114,27 +114,27 @@ export default function AyudaPage() {
     const faqs = [
         {
             category: "account",
-            question: "¿Cómo puedo cambiar mi contraseña?",
+            question: "¿Cómo creo una cuenta en JoinWithUs?",
             answer:
-                "Puedes cambiar tu contraseña desde la configuración de tu cuenta. Ve a 'Mi Perfil' > 'Seguridad' > 'Cambiar Contraseña'. También puedes usar la opción 'Olvidé mi contraseña' en la página de inicio de sesión.",
+                "Puedes registrarte desde la página principal haciendo clic en 'Crear Cuenta' y completando el formulario con tus datos personales.",
         },
         {
             category: "account",
-            question: "¿Cómo elimino mi cuenta?",
+            question: "¿Olvidé mi contraseña, cómo la recupero?",
             answer:
-                "Para eliminar tu cuenta, contacta a nuestro equipo de soporte. Ten en cuenta que esta acción es irreversible y se eliminarán todos tus datos permanentemente.",
+                "Haz clic en “¿Olvidaste tu contraseña?” en la pantalla de inicio de sesión y sigue los pasos para restablecerla mediante tu correo electrónico",
         },
         {
             category: "billing",
             question: "¿Qué métodos de pago aceptan?",
             answer:
-                "Aceptamos tarjetas de crédito y débito (Visa, MasterCard, American Express), PayPal, y transferencias bancarias para planes empresariales.",
+                "Aceptamos tarjetas de crédito y débito (Visa, Mastercard)",
         },
         {
             category: "billing",
-            question: "¿Puedo cancelar mi suscripción en cualquier momento?",
+            question: "¿Cómo obtengo mi recibo o factura por un evento comprado?",
             answer:
-                "Sí, puedes cancelar tu suscripción en cualquier momento desde tu panel de control. La cancelación será efectiva al final del período de facturación actual.",
+                "Una vez completado el pago, recibirás la factura en tu correo. También puedes descargarla desde el historial de compras en tu perfil.",
         },
         {
             category: "billing",
@@ -144,39 +144,33 @@ export default function AyudaPage() {
         },
         {
             category: "technical",
-            question: "¿Por qué mi aplicación carga lentamente?",
+            question: "No puedo acceder a mi cuenta, ¿qué puedo hacer?",
             answer:
-                "La velocidad puede verse afectada por varios factores: conexión a internet, caché del navegador, o tráfico alto en el servidor. Intenta limpiar el caché, usar una conexión estable, o contacta soporte si el problema persiste.",
+                "Verifica tu conexión a internet y asegúrate de que tu correo y contraseña sean correctos. Si el problema persiste, contáctanos a soporte@joinwithus.com.",
         },
         {
             category: "technical",
-            question: "¿Cómo puedo integrar la API?",
+            question: "La página no carga correctamente o aparece en blanco. ¿Qué hago?",
             answer:
-                "Consulta nuestra documentación completa de API en docs.ejemplo.com. Incluye ejemplos de código, endpoints disponibles, y guías paso a paso para diferentes lenguajes de programación.",
+                "Intenta borrar la caché de tu navegador o accede desde otro dispositivo. También puedes probar usando otro navegador actualizado.",
         },
         {
             category: "security",
-            question: "¿Cómo protegen mis datos?",
+            question: "¿Cómo protegen mis datos personales?",
             answer:
-                "Utilizamos encriptación SSL/TLS para todas las transmisiones, almacenamiento encriptado, autenticación de dos factores, y cumplimos con estándares internacionales de seguridad como SOC 2 y GDPR.",
-        },
-        {
-            category: "security",
-            question: "¿Puedo habilitar autenticación de dos factores?",
-            answer:
-                "Sí, recomendamos encarecidamente habilitar 2FA. Ve a 'Configuración' > 'Seguridad' > 'Autenticación de Dos Factores' y sigue las instrucciones para configurarla con tu aplicación de autenticación preferida.",
+                "Utilizamos cifrado SSL y almacenamos tu información en servidores seguros conforme a la Ley de Protección de Datos Personales.",
         },
         {
             category: "general",
-            question: "¿Cuáles son sus horarios de soporte?",
+            question: "¿Qué es JoinWithUs?",
             answer:
-                "Nuestro equipo de soporte está disponible de lunes a viernes de 9:00 AM a 6:00 PM (hora local). Para emergencias críticas, ofrecemos soporte 24/7 para planes empresariales.",
+                "Es una plataforma para encontrar, comprar y participar en eventos presenciales de forma sencilla y segura.",
         },
         {
             category: "general",
-            question: "¿Tienen una aplicación móvil?",
+            question: "¿Cómo puedo organizar un evento con ustedes?",
             answer:
-                "Sí, tenemos aplicaciones nativas para iOS y Android. Puedes descargarlas desde App Store y Google Play Store. También nuestra plataforma web es completamente responsive.",
+                "Completa el formulario que aparece en solicitud y uno de nuestros asesores se pondrá en contacto contigo para ayudarte a organizarlo.",
         },
     ]
 
