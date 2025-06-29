@@ -1,4 +1,11 @@
-export function formatearFecha(fechaISO: string) {
-  const fecha = new Date(fechaISO);
-  return new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long' }).format(fecha);
+export function formatearFecha(utcString: string) {
+  const [year, month, day] = utcString.slice(0, 10).split("-");
+
+  const meses = [
+    "enero", "febrero", "marzo", "abril", "mayo", "junio",
+    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+  ];
+
+  const nombreMes = meses[parseInt(month, 10) - 1];
+  return `${parseInt(day, 10)} de ${nombreMes}`;
 }
