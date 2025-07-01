@@ -11,6 +11,9 @@ import {
   HelpCircle,
   Package,
   Mail,
+  ArrowLeft,
+  Eye,
+  EyeOff,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -22,31 +25,46 @@ import { useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { validarSesion, cerrarSesion as cerrarSesionService } from "@/services/usuarios"
+import { validarSesion, cerrarSesion as cerrarSesionService, cambiarPassword } from "@/services/usuarios"
 import { obtenerHistorialDeOrdenes } from "@/services/ordenes";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
 
 import { OrderMapped } from "@/components/types/carrito"
 import EventoDialog from "@/components/custom/pdf/EventoDialog"
+import ChangePasswordForm from "@/components/principales/ChangePasswordForm"
+import { toast } from "sonner"
 
 export default function ProfilePage() {
   const [activeSection, setActiveSection] = useState("purchases");
   const [comprados, setComprados] = useState<OrderMapped[]>([]);
   const router = useRouter()
-const [usuario, setUsuario] = useState<{ fullName: string; email: string } | null>(null);
+  const [usuario, setUsuario] = useState<{ fullName: string; email: string; userId: string } | null>(null);
+  const [showPasswordChange, setShowPasswordChange] = useState(false)
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  })
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
+const [showSuccessDialog, setShowSuccessDialog] = useState(false)
 
-useEffect(() => {
-  async function checkSesion() {
-    const res = await validarSesion();
-    if (!res || !res.user) {
-      router.push("/usuario/login");
-    } else {
-      setUsuario({
-        fullName: res.user.fullName,
-        email: res.user.email,
-      });
+
+  useEffect(() => {
+    async function checkSesion() {
+      const res = await validarSesion();
+      if (!res || !res.user) {
+        router.push("/usuario/login");
+      } else {
+        setUsuario({
+          fullName: res.user.fullName,
+          email: res.user.email,
+          userId: res.user.userId,
+        });
+      }
     }
-  }
 
     checkSesion();
   }, [router]);
@@ -69,6 +87,69 @@ useEffect(() => {
     }
   }
 
+  function handlePasswordChange(field: string, value: string) {
+    setPasswordData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  function handleCancelPasswordChange() {
+    setShowPasswordChange(false)
+    setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    })
+    setShowCurrentPassword(false)
+    setShowNewPassword(false)
+    setShowConfirmPassword(false)
+  }
+
+  async function handlePasswordSubmit(e: React.FormEvent) {
+    e.preventDefault()
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      return toast.error("Las contraseñas no coinciden")
+    }
+
+    if (!usuario?.userId) {
+      return toast.error("No se pudo obtener el usuario")
+    }
+
+    try {
+      await cambiarPassword({
+        userId: usuario.userId,
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      })
+
+        
+      toast.success("Contraseña actualizada correctamente")
+      setShowConfirmDialog(true)
+      handleCancelPasswordChange()
+    } catch (error) {
+      toast.error("Error al cambiar la contraseña")
+    }
+  }
+
+  async function confirmarCambioDePassword() {
+  setShowConfirmDialog(false)
+
+  if (!usuario?.userId) {
+    return toast.error("No se pudo obtener el usuario")
+  }
+
+  try {
+    await cambiarPassword({
+      userId: usuario.userId,
+      currentPassword: passwordData.currentPassword,
+      newPassword: passwordData.newPassword,
+    })
+
+    setShowSuccessDialog(true) // Mostrar popup de éxito
+    handleCancelPasswordChange()
+  } catch (error) {
+    toast.error("Error al cambiar la contraseña")
+  }
+}
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -244,7 +325,7 @@ useEffect(() => {
                             <EventoDialog id={item.id.toString()}></EventoDialog>
                           </Dialog>
                         </div>
-                          
+
                       </div>
                     ))
                   )}
@@ -300,62 +381,107 @@ useEffect(() => {
                   <CardDescription>Gestiona tus preferencias y configuración de la cuenta</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-medium">Notificaciones</h3>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <p className="text-sm font-medium">Correos electrónicos de marketing</p>
-                        <p className="text-xs text-gray-500">Recibe ofertas y promociones especiales</p>
-                      </div>
-                      <div>
-                        <Label htmlFor="marketing" className="sr-only">
-                          Correos electrónicos de marketing
-                        </Label>
-                        <input
-                          type="checkbox"
-                          id="marketing"
-                          className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-0.5">
-                        <p className="text-sm font-medium">Actualizaciones de pedidos</p>
-                        <p className="text-xs text-gray-500">Recibe notificaciones sobre tus pedidos</p>
-                      </div>
-                      <div>
-                        <Label htmlFor="orders" className="sr-only">
-                          Actualizaciones de pedidos
-                        </Label>
-                        <input
-                          type="checkbox"
-                          id="orders"
-                          defaultChecked
-                          className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
-                        />
-                      </div>
-                    </div>
-                  </div>
 
                   <Separator />
 
                   <div className="space-y-4">
                     <h3 className="text-sm font-medium">Seguridad</h3>
-                    <Button variant="outline" size="sm">
-                      Cambiar contraseña
-                    </Button>
-                    <Button variant="outline" size="sm" className="ml-2">
-                      Activar autenticación de dos factores
-                    </Button>
-                  </div>
+                    {!showPasswordChange ? (
+                      <Button variant="outline" size="sm" onClick={() => setShowPasswordChange(true)}>
+                        Cambiar contraseña
+                      </Button>
+                    ) : (
+                      <div className="border rounded-lg p-6 bg-gray-50">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Button variant="ghost" size="sm" onClick={handleCancelPasswordChange} className="p-1 h-8 w-8">
+                            <ArrowLeft className="h-4 w-4" />
+                          </Button>
+                          <h4 className="text-lg font-medium">Cambiar contraseña</h4>
+                        </div>
 
-                  <Separator />
+                        <form onSubmit={handlePasswordSubmit} className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="current-password">Contraseña actual</Label>
+                            <div className="relative">
+                              <Input
+                                id="current-password"
+                                type={showCurrentPassword ? "text" : "password"}
+                                value={passwordData.currentPassword}
+                                onChange={(e) => handlePasswordChange("currentPassword", e.target.value)}
+                                placeholder="Ingresa tu contraseña actual"
+                                required
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                              >
+                                {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              </Button>
+                            </div>
+                          </div>
 
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-medium text-red-600">Zona de peligro</h3>
-                    <Button variant="destructive" size="sm">
-                      Eliminar cuenta
-                    </Button>
+                          <div className="space-y-2">
+                            <Label htmlFor="new-password">Nueva contraseña</Label>
+                            <div className="relative">
+                              <Input
+                                id="new-password"
+                                type={showNewPassword ? "text" : "password"}
+                                value={passwordData.newPassword}
+                                onChange={(e) => handlePasswordChange("newPassword", e.target.value)}
+                                placeholder="Ingresa tu nueva contraseña"
+                                required
+                                minLength={8}
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                onClick={() => setShowNewPassword(!showNewPassword)}
+                              >
+                                {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              </Button>
+                            </div>
+                            <p className="text-xs text-gray-500">La contraseña debe tener al menos 8 caracteres</p>
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label htmlFor="confirm-password">Confirmar nueva contraseña</Label>
+                            <div className="relative">
+                              <Input
+                                id="confirm-password"
+                                type={showConfirmPassword ? "text" : "password"}
+                                value={passwordData.confirmPassword}
+                                onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
+                                placeholder="Confirma tu nueva contraseña"
+                                required
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              >
+                                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                              </Button>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-2 pt-4">
+                            <Button type="submit" size="sm">
+                              Actualizar contraseña
+                            </Button>
+                            <Button type="button" variant="outline" size="sm" onClick={handleCancelPasswordChange}>
+                              Cancelar
+                            </Button>
+                          </div>
+                        </form>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -419,6 +545,38 @@ useEffect(() => {
           </div>
         </div>
       </main>
+
+
+      {/* Popup de confirmación */}
+<Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Confirmar cambio de contraseña</DialogTitle>
+      <DialogDescription>
+        ¿Estás seguro de que deseas cambiar tu contraseña? Esta acción no se puede deshacer.
+      </DialogDescription>
+    </DialogHeader>
+    <div className="flex justify-end gap-2 mt-4">
+      <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>Cancelar</Button>
+      <Button onClick={confirmarCambioDePassword}>Confirmar</Button>
+    </div>
+  </DialogContent>
+</Dialog>
+
+{/* Popup de éxito */}
+<Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Contraseña actualizada</DialogTitle>
+      <DialogDescription>
+        Tu contraseña se ha cambiado exitosamente.
+      </DialogDescription>
+    </DialogHeader>
+    <div className="flex justify-end mt-4">
+      <Button onClick={() => setShowSuccessDialog(false)}>Aceptar</Button>
+    </div>
+  </DialogContent>
+</Dialog>
     </div>
   )
 }
