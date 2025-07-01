@@ -32,6 +32,7 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, Dialog
 import { OrderMapped } from "@/components/types/carrito"
 import EventoDialog from "@/components/custom/pdf/EventoDialog"
 import ChangePasswordForm from "@/components/principales/ChangePasswordForm"
+import { editarUsuarioPerfil } from "@/services/usuarios"
 import { toast } from "sonner"
 
 export default function ProfilePage() {
@@ -39,6 +40,10 @@ export default function ProfilePage() {
   const [comprados, setComprados] = useState<OrderMapped[]>([]);
   const router = useRouter()
   const [usuario, setUsuario] = useState<{ fullName: string; email: string; userId: string } | null>(null);
+  const [perfilEditable, setPerfilEditable] = useState({
+    fullName: "",
+    email: "",// opcional si quieres agregarlo
+  })
   const [showPasswordChange, setShowPasswordChange] = useState(false)
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -49,7 +54,8 @@ export default function ProfilePage() {
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
-const [showSuccessDialog, setShowSuccessDialog] = useState(false)
+  const [showSuccessDialogPassword, setShowSuccessDialogPassword] = useState(false)
+  const [showSuccessDialogProfile, setShowSuccessDialogProfile] = useState(false)
 
 
   useEffect(() => {
@@ -62,6 +68,10 @@ const [showSuccessDialog, setShowSuccessDialog] = useState(false)
           fullName: res.user.fullName,
           email: res.user.email,
           userId: res.user.userId,
+        });
+        setPerfilEditable({
+          fullName: res.user.fullName,
+          email: res.user.email,
         });
       }
     }
@@ -121,7 +131,7 @@ const [showSuccessDialog, setShowSuccessDialog] = useState(false)
         newPassword: passwordData.newPassword,
       })
 
-        
+
       toast.success("Contraseña actualizada correctamente")
       setShowConfirmDialog(true)
       handleCancelPasswordChange()
@@ -131,25 +141,43 @@ const [showSuccessDialog, setShowSuccessDialog] = useState(false)
   }
 
   async function confirmarCambioDePassword() {
-  setShowConfirmDialog(false)
+    setShowConfirmDialog(false)
 
-  if (!usuario?.userId) {
-    return toast.error("No se pudo obtener el usuario")
+    if (!usuario?.userId) {
+      return toast.error("No se pudo obtener el usuario")
+    }
+
+    try {
+      await cambiarPassword({
+        userId: usuario.userId,
+        currentPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword,
+      })
+
+      setShowSuccessDialogPassword(true) // Mostrar popup de éxito
+      handleCancelPasswordChange()
+    } catch (error) {
+      toast.error("Error al cambiar la contraseña")
+    }
   }
 
-  try {
-    await cambiarPassword({
-      userId: usuario.userId,
-      currentPassword: passwordData.currentPassword,
-      newPassword: passwordData.newPassword,
-    })
+  async function handleGuardarCambios() {
+    if (!usuario?.userId) {
+      return toast.error("No se pudo obtener el usuario");
+    }
 
-    setShowSuccessDialog(true) // Mostrar popup de éxito
-    handleCancelPasswordChange()
-  } catch (error) {
-    toast.error("Error al cambiar la contraseña")
+    try {
+      await editarUsuarioPerfil({
+        userId: usuario.userId,
+        fullName: perfilEditable.fullName,
+        email: perfilEditable.email,
+      });
+
+      setShowSuccessDialogProfile(true); // <-- Mostramos el popup
+    } catch (error) {
+      toast.error("Error al guardar los cambios");
+    }
   }
-}
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -159,11 +187,8 @@ const [showSuccessDialog, setShowSuccessDialog] = useState(false)
           <div className="md:col-span-1">
             <Card>
               <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                <div className="relative h-16 w-16 rounded-full overflow-hidden">
-                  <Image src="/placeholder.svg?height=64&width=64" alt="Avatar" fill className="object-cover" />
-                </div>
-                <div className="flex flex-col">
-                  <CardTitle>{usuario?.fullName || "Usuario"}</CardTitle>
+                <div className="flex flex-col justify-center flex-1 text-center sm:text-left">
+                  <CardTitle className="text-lg">{usuario?.fullName || "Usuario"}</CardTitle>
                   <p className="text-sm text-gray-500">{usuario?.email || "correo@ejemplo.com"}</p>
                 </div>
               </CardHeader>
@@ -252,35 +277,26 @@ const [showSuccessDialog, setShowSuccessDialog] = useState(false)
                     <div className="flex-1 space-y-4">
                       <div className="space-y-2">
                         <Label htmlFor="name">Nombre completo</Label>
-                        <Input id="name" defaultValue="María García" />
+                        <Input
+                          id="name"
+                          value={perfilEditable.fullName}
+                          onChange={(e) => setPerfilEditable({ ...perfilEditable, fullName: e.target.value })}
+                        />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="email">Correo electrónico</Label>
-                        <Input id="email" defaultValue="maria.garcia@ejemplo.com" />
+                        <Input
+                          id="email"
+                          value={perfilEditable.email}
+                          onChange={(e) => setPerfilEditable({ ...perfilEditable, email: e.target.value })}
+                        />
                       </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Teléfono</Label>
-                        <Input id="phone" defaultValue="+34 612 345 678" />
-                      </div>
-                    </div>
-                    <div className="flex-1 space-y-4">
-                      <div className="space-y-2">
-                        <Label>Foto de perfil</Label>
-                        <div className="flex flex-col items-center gap-4">
-                          <Avatar className="h-24 w-24">
-                            <AvatarImage src="/placeholder.svg?height=96&width=96" alt="Avatar" />
-                            <AvatarFallback>MG</AvatarFallback>
-                          </Avatar>
-                          <Button variant="outline" size="sm">
-                            Cambiar foto
-                          </Button>
-                        </div>
-                      </div>
+
                     </div>
                   </div>
                   <Separator />
                   <div className="flex justify-end">
-                    <Button>Guardar cambios</Button>
+                    <Button onClick={handleGuardarCambios}>Guardar cambios</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -548,35 +564,71 @@ const [showSuccessDialog, setShowSuccessDialog] = useState(false)
 
 
       {/* Popup de confirmación */}
-<Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Confirmar cambio de contraseña</DialogTitle>
-      <DialogDescription>
-        ¿Estás seguro de que deseas cambiar tu contraseña? Esta acción no se puede deshacer.
-      </DialogDescription>
-    </DialogHeader>
-    <div className="flex justify-end gap-2 mt-4">
-      <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>Cancelar</Button>
-      <Button onClick={confirmarCambioDePassword}>Confirmar</Button>
-    </div>
-  </DialogContent>
-</Dialog>
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar cambio de contraseña</DialogTitle>
+            <DialogDescription>
+              ¿Estás seguro de que deseas cambiar tu contraseña? Esta acción no se puede deshacer.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>Cancelar</Button>
+            <Button onClick={confirmarCambioDePassword}>Confirmar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
-{/* Popup de éxito */}
-<Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Contraseña actualizada</DialogTitle>
-      <DialogDescription>
-        Tu contraseña se ha cambiado exitosamente.
-      </DialogDescription>
-    </DialogHeader>
-    <div className="flex justify-end mt-4">
-      <Button onClick={() => setShowSuccessDialog(false)}>Aceptar</Button>
-    </div>
-  </DialogContent>
-</Dialog>
+      {/* Popup de éxito */}
+      <Dialog open={showSuccessDialogPassword} onOpenChange={setShowSuccessDialogPassword}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Contraseña actualizada</DialogTitle>
+            <DialogDescription>
+              Tu contraseña se ha cambiado exitosamente.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end mt-4">
+            <Button onClick={() => setShowSuccessDialogPassword(false)}>Aceptar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog de éxito para actualización de perfil */}
+      <Dialog open={showSuccessDialogProfile} onOpenChange={setShowSuccessDialogProfile}>
+       <DialogContent className="sm:max-w-md bg-white shadow-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
+                <svg className="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              Perfil actualizado
+            </DialogTitle>
+            <DialogDescription className="text-left space-y-2">
+              <p>Tu información ha sido actualizada correctamente.</p>
+              <p className="text-sm text-amber-600 font-medium">
+                Por seguridad, debes volver a iniciar sesión para ver los cambios reflejados.
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 gap-2 mt-4">
+            <Button variant="outline" onClick={() => setShowSuccessDialogProfile(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                cerrarSesion()
+                setShowSuccessDialogProfile(false)
+              }}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              Cerrar sesión
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

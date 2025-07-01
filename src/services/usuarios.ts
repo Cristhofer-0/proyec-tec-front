@@ -1,5 +1,6 @@
 import { CambioPasswordData } from "@/components/types/CambiarPasswordData";
 import { UsuarioData } from "@/components/types/UsuarioData";
+import { UsuarioDataPerfil } from "@/components/types/UsuarioDataPerfil";
 import { API_BASE_URL } from "@/lib/config"
 
 
@@ -95,5 +96,26 @@ export async function cambiarPassword(data: CambioPasswordData): Promise<void> {
     const errorText = await response.text()
     console.error("Error:", errorText)
     throw new Error("No se pudo cambiar la contraseña")
+  }
+}
+
+export async function editarUsuarioPerfil(usuario: UsuarioDataPerfil): Promise<void> {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
+
+  const response = await fetch(`${API_BASE_URL}/usuarios/${usuario.userId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      FullName: usuario.fullName,
+      Email: usuario.email,
+    }),
+  })
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    console.error("Error en la respuesta de la API:", errorText)
+    throw new Error("No se pudo editar el usuario")
   }
 }
