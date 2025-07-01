@@ -237,20 +237,6 @@ export default function ProfilePage() {
                     <ChevronRight className="h-4 w-4" />
                   </button>
 
-                  <button
-                    onClick={() => setActiveSection("help")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "help" ? "bg-purple-50 text-purple-600" : ""
-                      }`}
-                  >
-                    <div className="flex items-center">
-                      <HelpCircle
-                        className={`mr-3 h-5 w-5 ${activeSection === "help" ? "text-purple-600" : "text-gray-400"}`}
-                      />
-                      <span>Ayuda</span>
-                    </div>
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-
                   <Separator className="my-2" />
                   <button
                     onClick={cerrarSesion}
@@ -498,62 +484,6 @@ export default function ProfilePage() {
                         </form>
                       </div>
                     )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {activeSection === "help" && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Centro de ayuda</CardTitle>
-                  <CardDescription>Encuentra respuestas a tus preguntas</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Preguntas frecuentes</h3>
-
-                    <div className="space-y-4">
-                      <div className="border rounded-lg p-4">
-                        <h4 className="font-medium mb-2">¿Cómo puedo cambiar mi dirección de envío?</h4>
-                        <p className="text-sm text-gray-600">
-                          Puedes actualizar tu dirección de envío en la sección &quot;Mi cuenta&quot; &gt;
-                          &quot;Direcciones&quot;. Allí podrás añadir, editar o eliminar tus direcciones.
-                        </p>
-                      </div>
-
-                      <div className="border rounded-lg p-4">
-                        <h4 className="font-medium mb-2">¿Cuánto tiempo tarda en llegar mi pedido?</h4>
-                        <p className="text-sm text-gray-600">
-                          El tiempo de entrega depende de tu ubicación. Normalmente, los pedidos se entregan en 2-5 días
-                          laborables. Puedes consultar el estado de tu pedido en la sección &quot;Mis compras&quot;.
-                        </p>
-                      </div>
-
-                      <div className="border rounded-lg p-4">
-                        <h4 className="font-medium mb-2">¿Cómo puedo devolver un producto?</h4>
-                        <p className="text-sm text-gray-600">
-                          Para devolver un producto, ve a &quot;Mis compras&quot;, selecciona el pedido y haz clic en
-                          &quot;Solicitar devolución&quot;. Tienes 30 días desde la fecha de entrega para realizar
-                          devoluciones.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-medium">Contacto</h3>
-                    <p className="text-sm text-gray-600">
-                      ¿No encuentras lo que buscas? Ponte en contacto con nuestro equipo de soporte.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <Button variant="outline">
-                        <Mail className="mr-2 h-4 w-4" />
-                        Enviar correo
-                      </Button>
-                    </div>
                   </div>
                 </CardContent>
               </Card>
