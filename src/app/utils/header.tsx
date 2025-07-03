@@ -222,7 +222,7 @@ const Header: React.FC = () => {
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="h-6 w-6"
                                 onClick={(e) => {
                                   e.stopPropagation()
                                   eliminarNotificacion(notificacion.id)
@@ -244,7 +244,7 @@ const Header: React.FC = () => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link
-                        href="/notificaciones"
+                        href="/usuario/perfil"
                         className="w-full text-center text-sm text-muted-foreground hover:text-foreground"
                       >
                         Ver todas las notificaciones

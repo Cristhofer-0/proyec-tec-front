@@ -14,6 +14,7 @@ import {
   ArrowLeft,
   Eye,
   EyeOff,
+  X,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -36,6 +37,15 @@ import { editarUsuarioPerfil } from "@/services/usuarios"
 import { toast } from "sonner"
 import { useUserStore } from "@/stores/userStore";
 
+interface Notificacion {
+  id: string
+  titulo: string
+  mensaje: string
+  fecha: Date
+  leida: boolean
+  tipo: "evento" | "sistema" | "promocion"
+}
+
 export default function ProfilePage() {
   const [activeSection, setActiveSection] = useState("purchases");
   const [comprados, setComprados] = useState<OrderMapped[]>([]);
@@ -57,6 +67,57 @@ export default function ProfilePage() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [showSuccessDialogPassword, setShowSuccessDialogPassword] = useState(false)
   const [showSuccessDialogProfile, setShowSuccessDialogProfile] = useState(false)
+  const [notificaciones, setNotificaciones] = useState<Notificacion[]>([])
+
+
+  // 🔢 Contar notificaciones no leídas
+  const notificacionesNoLeidas = notificaciones.filter((n) => !n.leida).length
+
+  // ✅ Marcar notificación como leída
+  const marcarComoLeida = (id: string) => {
+    setNotificaciones((prev) => {
+      const actualizadas = prev.map((notif) =>
+        notif.id === id ? { ...notif, leida: true } : notif
+      );
+      localStorage.setItem("notificaciones", JSON.stringify(actualizadas));
+      return actualizadas;
+    });
+  };
+
+
+  // ✅ Marcar todas como leídas
+  const marcarTodasComoLeidas = () => {
+    setNotificaciones((prev) => {
+      const actualizadas = prev.map((notif) => ({ ...notif, leida: true }));
+      localStorage.setItem("notificaciones", JSON.stringify(actualizadas));
+      return actualizadas;
+    });
+  };
+
+  // ✅ Eliminar notificación
+  const eliminarNotificacion = (id: string) => {
+    setNotificaciones((prev) => {
+      const actualizadas = prev.filter((notif) => notif.id !== id);
+      localStorage.setItem("notificaciones", JSON.stringify(actualizadas));
+      return actualizadas;
+    });
+  };
+
+  const formatearFecha = (fecha: Date) => {
+    const ahora = new Date()
+    const diferencia = ahora.getTime() - fecha.getTime()
+    const minutos = Math.floor(diferencia / (1000 * 60))
+    const horas = Math.floor(diferencia / (1000 * 60 * 60))
+    const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24))
+
+    if (minutos < 60) {
+      return `Hace ${minutos} min`
+    } else if (horas < 24) {
+      return `Hace ${horas}h`
+    } else {
+      return `Hace ${dias}d`
+    }
+  }
 
 
   useEffect(() => {
@@ -79,6 +140,18 @@ export default function ProfilePage() {
 
     checkSesion();
   }, [router]);
+
+useEffect(() => {
+  const notificacionesGuardadas = localStorage.getItem("notificaciones");
+  if (notificacionesGuardadas) {
+    try {
+      const parsed: Notificacion[] = JSON.parse(notificacionesGuardadas);
+      setNotificaciones(parsed);
+    } catch (error) {
+      console.error("Error al parsear notificaciones del localStorage", error);
+    }
+  }
+}, []);
 
   useEffect(() => {
     async function cargarComprados() {
@@ -219,6 +292,18 @@ export default function ProfilePage() {
                   </button>
 
                   <button
+                    onClick={() => setActiveSection("notifications")}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "notifications" ? "bg-purple-50 text-purple-600" : ""
+                      }`}
+                  >
+                    <div className="flex items-center">
+                      <Mail className={`mr-3 h-5 w-5 ${activeSection === "notifications" ? "text-purple-600" : "text-gray-400"}`} />
+                      <span>Notificaciones</span>
+                    </div>
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+
+                  <button
                     onClick={() => setActiveSection("purchases")}
                     className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "purchases" ? "bg-purple-50 text-purple-600" : ""
                       }`}
@@ -296,6 +381,76 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
             )}
+
+            {activeSection === "notifications" && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Notificaciones</CardTitle>
+                  <CardDescription>Revisa tus alertas importantes</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {notificaciones.length === 0 ? (
+                    <p className="text-center text-gray-500">No tienes notificaciones.</p>
+                  ) : (
+                    notificaciones.map((notif) => (
+                      <div key={notif.id} className={`border p-4 rounded-md ${!notif.leida ? "bg-purple-50" : "bg-white"}`}>
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <span
+                              className={`text-xs px-2 py-1 rounded-full ${notif.tipo === "evento"
+                                ? "bg-blue-100 text-blue-800"
+                                : notif.tipo === "sistema"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-purple-100 text-purple-800"
+                                }`}
+                            >
+                              {notif.tipo}
+                            </span>
+                            <h4 className="text-sm font-medium mt-1">{notif.titulo}</h4>
+                            <p className="text-xs text-muted-foreground">{notif.mensaje}</p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {formatearFecha(new Date(notif.fecha))}
+                            </p>
+                          </div>
+                          {!notif.leida && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => marcarComoLeida(notif.id)}
+                            >
+                              Marcar como leída
+                            </Button>
+                          )}
+                                                        <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  eliminarNotificacion(notif.id)
+                                }}
+                              >
+                                <X className="h-3 w-3" />
+                              </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  {notificaciones.length > 0 && (
+                    <div className="flex justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={marcarTodasComoLeidas}
+                      >
+                        Marcar todas como leídas
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
 
             {activeSection === "purchases" && (
               <Card>
