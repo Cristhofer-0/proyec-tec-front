@@ -1,5 +1,9 @@
 import { create } from "zustand"
 
+import { io } from "socket.io-client";
+
+
+
 interface User {
   email: string
 }
@@ -10,8 +14,14 @@ interface UserState {
   clearUser: () => void
 }
 
+const socket = io('http://localhost:3000');
+
 export const useUserStore = create<UserState>((set) => ({
   user: null,
   setUser: (user) => set({ user }),
-  clearUser: () => set({ user: null }),
-}))
+  clearUser: () => {
+    localStorage.removeItem("user");
+    socket.disconnect(); // 👈 MUY IMPORTANTE
+    set({ user: null });
+  },
+}));

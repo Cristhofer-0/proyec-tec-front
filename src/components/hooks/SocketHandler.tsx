@@ -1,14 +1,29 @@
 'use client';
 
-import { useEffect } from 'react';
-import { io } from 'socket.io-client';
+import { useEffect, useRef } from 'react';
 import { toast } from "@/components/ui/use-toast";
-
-const socket = io('http://localhost:3000');
+import { useUserStore } from "@/stores/userStore";
+import { io, Socket } from 'socket.io-client';
 
 export default function SocketHandler() {
+  const user = useUserStore((state) => state.user);
+  const socketRef = useRef<Socket | null>(null);
+
   useEffect(() => {
-    socket.on('evento_modificado', (data) => {
+    if (!user) {
+      // 🔌 Desconecta si no hay usuario
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+      return;
+    }
+
+    // 🔌 Conecta solo si hay usuario
+    const socket = io('http://localhost:3000');
+    socketRef.current = socket;
+
+    socket.on('evento_modificado', (data: any) => {
       toast({
         title: "🔔 Evento modificado",
         description: (
@@ -27,9 +42,10 @@ export default function SocketHandler() {
     });
 
     return () => {
-      socket.off('evento_modificado');
+      socket.disconnect();
+      socketRef.current = null;
     };
-  }, []);
+  }, [user]);
 
   return null;
 }

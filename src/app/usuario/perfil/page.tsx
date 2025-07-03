@@ -88,14 +88,20 @@ export default function ProfilePage() {
     cargarComprados();
   }, []);
 
-  async function cerrarSesion() {
-    const ok = await cerrarSesionService(); // Evita que se llame asi mismo y no al import
-    if (ok) {
-      router.push("/usuario/login");
-    } else {
-      console.error("Error al cerrar sesión");
-    }
+async function cerrarSesion() {
+  const ok = await cerrarSesionService();
+  if (ok) {
+    // Primero redirige
+    router.push("/usuario/login");
+
+    // Luego fuerza la recarga total de la página después de un breve delay
+    setTimeout(() => {
+      window.location.reload(); // 🔄 fuerza recarga
+    }, 100); // pequeño delay para asegurar que el push tenga efecto
+  } else {
+    console.error("Error al cerrar sesión");
   }
+}
 
   function handlePasswordChange(field: string, value: string) {
     setPasswordData((prev) => ({ ...prev, [field]: value }))
