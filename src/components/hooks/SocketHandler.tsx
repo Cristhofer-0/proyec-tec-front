@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useRef } from 'react';
 import { toast } from "@/components/ui/use-toast";
@@ -11,7 +11,6 @@ export default function SocketHandler() {
 
   useEffect(() => {
     if (!user) {
-      // 🔌 Desconecta si no hay usuario
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
@@ -19,11 +18,11 @@ export default function SocketHandler() {
       return;
     }
 
-    // 🔌 Conecta solo si hay usuario
     const socket = io('http://localhost:3000');
     socketRef.current = socket;
 
     socket.on('evento_modificado', (data: any) => {
+      {/* Mostrar toast
       toast({
         title: "🔔 Evento modificado",
         description: (
@@ -35,10 +34,26 @@ export default function SocketHandler() {
             >
               {data.nombre}
             </a>{" "}
-            ha sido actualizado.
+            ha sido actualizado, verifica los cambios si has hecho alguna compra.
           </span>
         ),
-      });
+      });*/}
+
+      // Guardar notificación en localStorage
+      const nuevaNotificacion = {
+        id: crypto.randomUUID(), // o genera un ID único
+        titulo: "Evento modificado",
+        mensaje: `El evento "${data.nombre}" ha sido actualizado, verifica los cambios si has hecho alguna compra.`,
+        fecha: new Date().toISOString(),
+        leida: false,
+        tipo: "evento",
+      };
+
+      const prev = JSON.parse(localStorage.getItem("notificaciones") || "[]");
+      localStorage.setItem("notificaciones", JSON.stringify([nuevaNotificacion, ...prev]));
+      
+      // 🚨 IMPORTANTE: Dispara evento para que Header se actualice
+      window.dispatchEvent(new Event("nueva-notificacion"));
     });
 
     return () => {

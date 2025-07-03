@@ -34,6 +34,7 @@ import EventoDialog from "@/components/custom/pdf/EventoDialog"
 import ChangePasswordForm from "@/components/principales/ChangePasswordForm"
 import { editarUsuarioPerfil } from "@/services/usuarios"
 import { toast } from "sonner"
+import { useUserStore } from "@/stores/userStore";
 
 export default function ProfilePage() {
   const [activeSection, setActiveSection] = useState("purchases");
@@ -88,20 +89,22 @@ export default function ProfilePage() {
     cargarComprados();
   }, []);
 
-async function cerrarSesion() {
-  const ok = await cerrarSesionService();
-  if (ok) {
-    // Primero redirige
-    router.push("/usuario/login");
+  async function cerrarSesion() {
+    const clearUser = useUserStore.getState().clearUser; // limpia el store y el localStorage
+    const ok = await cerrarSesionService(); // llamada al backend
 
-    // Luego fuerza la recarga total de la página después de un breve delay
-    setTimeout(() => {
-      window.location.reload(); // 🔄 fuerza recarga
-    }, 100); // pequeño delay para asegurar que el push tenga efecto
-  } else {
-    console.error("Error al cerrar sesión");
+    if (ok) {
+      clearUser();
+      sessionStorage.setItem("logout", "true");
+
+      router.push("/usuario/login"); // usa el hook ya declarado arriba
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    } else {
+      console.error("Error al cerrar sesión");
+    }
   }
-}
 
   function handlePasswordChange(field: string, value: string) {
     setPasswordData((prev) => ({ ...prev, [field]: value }))
@@ -532,7 +535,7 @@ async function cerrarSesion() {
 
       {/* Dialog de éxito para actualización de perfil */}
       <Dialog open={showSuccessDialogProfile} onOpenChange={setShowSuccessDialogProfile}>
-       <DialogContent className="sm:max-w-md bg-white shadow-lg">
+        <DialogContent className="sm:max-w-md bg-white shadow-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <div className="h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">

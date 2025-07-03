@@ -12,7 +12,6 @@ export default function TermsPage() {
         <ScrollText className="h-8 w-8 text-primary" />
         <div>
           <h1 className="text-3xl font-bold">Términos y Condiciones</h1>
-          <p className="text-muted-foreground mt-1">Última actualización: 26 de junio de 2025</p>
         </div>
       </div>
 
@@ -221,32 +220,19 @@ export default function TermsPage() {
             </p>
             <div className="grid gap-2 text-sm">
               <p>
-                <strong>Correo electrónico:</strong> legal@eventtickets.com
+                <strong>Correo electrónico:</strong> info@joinwithus.com
               </p>
               <p>
-                <strong>Teléfono:</strong> +1 (555) 123-4567
+                <strong>Teléfono:</strong> +51 912 345 678
               </p>
               <p>
-                <strong>Dirección:</strong> 123 Event Street, Ciudad, País, CP 12345
+                <strong>Dirección:</strong> Calle Esmeralda 123, Lima
               </p>
             </div>
           </CardContent>
         </Card>
 
         <Separator />
-
-        {/* Botones de acción */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button asChild>
-            <Link href="/cart">Volver al Carrito</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/privacy">Política de Privacidad</Link>
-          </Button>
-          <Button variant="outline" asChild>
-            <Link href="/contact">Contactar Soporte</Link>
-          </Button>
-        </div>
 
         {/* Nota final */}
         <div className="text-center text-sm text-muted-foreground bg-muted p-4 rounded-lg">
