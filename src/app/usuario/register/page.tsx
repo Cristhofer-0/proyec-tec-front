@@ -13,10 +13,11 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { registerUser } from "@/services/usuarios"
+import { validarDNI } from "@/services/dni"
 
 export default function RegisterContent() {
   const router = useRouter()
-
+  const [dniError, setDniError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -56,6 +57,16 @@ export default function RegisterContent() {
       return
     }
 
+    const { valido, error } = await validarDNI(formData.dni)
+    if (!valido) {
+      setDniError(error || "DNI inválido")
+      toast.error(error || "DNI inválido")
+      return
+    } else {
+      setDniError("")
+    }
+
+
     try {
       const payload = {
         FullName: formData.fullName,
@@ -84,7 +95,7 @@ export default function RegisterContent() {
   ]
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-4">
+    <div className="flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-lg space-y-6">
         <Card>
           <CardHeader className="text-center">
@@ -114,11 +125,12 @@ export default function RegisterContent() {
                   </Label>
                   <Input
                     id="dni"
-                    placeholder="12345678A"
+                    placeholder="12345678"
                     value={formData.dni}
                     onChange={(e) => handleInputChange("dni", e.target.value)}
                     required
                   />
+                  {dniError && <p className="text-sm text-destructive">{dniError}</p>}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="birthDate">
@@ -262,7 +274,9 @@ export default function RegisterContent() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full gap-2">
+              <Button 
+                type="submit" 
+                className="w-full bg-purple-600 hover:bg-indigo-700 text-white" >
                 <UserIcon className="h-4 w-4" />
                 Crear Cuenta
               </Button>
