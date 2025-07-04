@@ -5,6 +5,7 @@ import { io } from "socket.io-client";
 
 
 interface User {
+  id: string
   email: string
 }
 

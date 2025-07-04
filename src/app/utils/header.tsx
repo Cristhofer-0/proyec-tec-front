@@ -69,6 +69,16 @@ const Header: React.FC = () => {
     };
   }, [setUser]);
 
+  useEffect(() => {
+  if (user) {
+    const local = localStorage.getItem("notificaciones");
+    const datos: Notificacion[] = local ? JSON.parse(local) : [];
+    const parsed = datos.map(n => ({ ...n, fecha: new Date(n.fecha) }));
+    setNotificaciones(parsed);
+  }
+}, [user]);
+
+
 
   useEffect(() => {
     actualizarCarrito()
