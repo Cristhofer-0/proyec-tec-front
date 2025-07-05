@@ -3,9 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button"
 import EventCard from "@/components/custom/pdf/EventCard"
 import { notFound } from "next/navigation"
+import { API_BASE_URL } from "@/lib/config"
 
 export default async function EventoPage({ params }: { params: { id: string } }) {
-  const res = await fetch(`http://localhost:3000/orders/${params.id}`)
+  const res = await fetch(`${API_BASE_URL}/orders/${params.id}`)
 
   if (!res.ok) return notFound()
 

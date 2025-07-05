@@ -1,5 +1,7 @@
 // services/email.ts
 
+import { API_BASE_URL } from "@/lib/config"
+
 export const validarEmail = async (
   email: string
 ): Promise<{ valido: boolean; error?: string }> => {
@@ -10,7 +12,7 @@ export const validarEmail = async (
   }
 
   try {
-    const response = await fetch(`http://localhost:3000/api/validar-email`, {
+    const response = await fetch(`${API_BASE_URL}/api/validar-email`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -8,6 +8,7 @@ import { useEffect, useState } from "react"
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import { EventoPDF } from './EventPDF'
 import { generarQRBase64 } from '../../types/generarQR'
+import { API_BASE_URL } from "@/lib/config"
 
 
 type Evento = {
@@ -51,7 +52,7 @@ export default function EventoDialog({ id }: { id: string }) {
 
   useEffect(() => {
     const fetchEvento = async () => {
-      const res = await fetch(`http://localhost:3000/orders/${id}`)
+      const res = await fetch(`${API_BASE_URL}/orders/${id}`)
       if (res.ok) {
         const data = await res.json()
         setOrden(data)

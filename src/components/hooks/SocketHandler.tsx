@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from 'react';
+import { API_BASE_URL } from "@/lib/config"
 import { toast } from "@/components/ui/use-toast";
 import { useUserStore } from "@/stores/userStore";
 import { io, Socket } from 'socket.io-client';
@@ -12,7 +13,7 @@ export default function SocketHandler() {
   useEffect(() => {
     // Conectar el socket siempre (con o sin usuario)
     if (!socketRef.current) {
-      const socket = io('http://localhost:3000');
+      const socket = io(`${API_BASE_URL}`);
       socketRef.current = socket;
 
       socket.on('evento_modificado', (data: any) => {

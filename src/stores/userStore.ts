@@ -1,7 +1,7 @@
 import { create } from "zustand"
 
 import { io } from "socket.io-client";
-
+import { API_BASE_URL } from "@/lib/config"
 
 
 interface User {
@@ -15,7 +15,7 @@ interface UserState {
   clearUser: () => void
 }
 
-const socket = io('http://localhost:3000');
+const socket = io(`${API_BASE_URL}`);
 
 export const useUserStore = create<UserState>((set) => {
   let storedUser = null;
