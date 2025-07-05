@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import { validarDNI } from "@/services/dni"
+import { validarTelefono } from "@/services/telefono"
+
 import {
   Card,
   CardContent,
@@ -60,6 +62,17 @@ export default function FormularioCambioRol() {
       toast({
         title: "DNI inválido",
         description: error,
+        variant: "destructive",
+      })
+      setIsSubmitting(false)
+      return
+    }
+
+    const { valido: telefonoValido, error: errorTelefono } = await validarTelefono(formData.telefono)
+    if (!telefonoValido) {
+      toast({
+        title: "Número inválido",
+        description: errorTelefono,
         variant: "destructive",
       })
       setIsSubmitting(false)
