@@ -24,6 +24,7 @@ export default function RegisterContent() {
   const [emailError, setEmailError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [birthDateError, setBirthDateError] = useState("")
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -44,6 +45,34 @@ export default function RegisterContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    const hoy = new Date()
+    const fechaNacimiento = new Date(formData.birthDate)
+    const edad =
+      hoy.getFullYear() -
+      fechaNacimiento.getFullYear() -
+      (hoy.getMonth() < fechaNacimiento.getMonth() ||
+        (hoy.getMonth() === fechaNacimiento.getMonth() && hoy.getDate() < fechaNacimiento.getDate())
+        ? 1
+        : 0)
+
+    // Validaciones personalizadas de fecha
+    if (fechaNacimiento > hoy) {
+      setBirthDateError("La fecha de nacimiento no puede ser en el futuro")
+      toast.error("La fecha de nacimiento no puede ser en el futuro")
+      return
+    } else {
+      setBirthDateError("")
+    }
+
+    if (edad < 18) {
+      setBirthDateError("Debes ser mayor de edad para registrarte (mínimo 18 años)")
+      toast.error("Debes ser mayor de edad para registrarte (mínimo 18 años)")
+      return
+    } else {
+      setBirthDateError("")
+    }
+
 
     // Validaciones básicas
     if (!formData.fullName || !formData.email || !formData.password || !formData.dni || !formData.birthDate || !formData.phone) {
@@ -149,7 +178,13 @@ export default function RegisterContent() {
                     id="dni"
                     placeholder="12345678"
                     value={formData.dni}
-                    onChange={(e) => handleInputChange("dni", e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      if (/^\d{0,8}$/.test(value)) {
+                        handleInputChange("dni", value)
+                      }
+                    }}
+                    maxLength={8}
                     required
                   />
                   {dniError && <p className="text-sm text-destructive">{dniError}</p>}
@@ -165,6 +200,7 @@ export default function RegisterContent() {
                     onChange={(e) => handleInputChange("birthDate", e.target.value)}
                     required
                   />
+                  {birthDateError && <p className="text-sm text-destructive">{birthDateError}</p>}
                 </div>
               </div>
 
@@ -176,7 +212,13 @@ export default function RegisterContent() {
                   id="phone"
                   placeholder="123456789"
                   value={formData.phone}
-                  onChange={(e) => handleInputChange("phone", e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (/^\d{0,9}$/.test(value)) {
+                      handleInputChange("phone", value)
+                    }
+                  }}
+                  maxLength={9}
                   required
                 />
                 {telefonoError && <p className="text-sm text-destructive">{telefonoError}</p>}
@@ -228,9 +270,8 @@ export default function RegisterContent() {
                       {passwordRequirements.map((req, index) => (
                         <div key={index} className="flex items-center gap-2 text-sm">
                           <div
-                            className={`flex h-4 w-4 items-center justify-center rounded-full ${
-                              req.met ? "bg-green-500" : "bg-muted"
-                            }`}
+                            className={`flex h-4 w-4 items-center justify-center rounded-full ${req.met ? "bg-green-500" : "bg-muted"
+                              }`}
                           >
                             {req.met && <CheckIcon className="h-3 w-3 text-white" />}
                           </div>
@@ -298,8 +339,8 @@ export default function RegisterContent() {
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full bg-purple-600 hover:bg-indigo-700 text-white" >
                 <UserIcon className="h-4 w-4" />
                 Crear Cuenta
