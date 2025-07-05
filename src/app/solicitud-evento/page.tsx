@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import { validarDNI } from "@/services/dni"
 import { validarTelefono } from "@/services/telefono"
+import { validarEmail } from "@/services/email"
 
 import {
   Card,
@@ -73,6 +74,17 @@ export default function FormularioCambioRol() {
       toast({
         title: "Número inválido",
         description: errorTelefono,
+        variant: "destructive",
+      })
+      setIsSubmitting(false)
+      return
+    }
+
+    const { valido: emailValido, error: errorEmail } = await validarEmail(formData.email)
+    if (!emailValido) {
+      toast({
+        title: "Correo inválido",
+        description: errorEmail,
         variant: "destructive",
       })
       setIsSubmitting(false)
