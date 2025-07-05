@@ -36,8 +36,10 @@ export default function EventosPage() {
     async function loadEventos() {
       try {
         const data = await fetchEventos()
+        const publicados = data.filter((evento) => evento.estado === "published")
+        setFilteredEventos(publicados)
         //setEventos(data)
-        setFilteredEventos(data)
+
         //setIsLoading(false)
 
         const categoriasMap = new Map()
