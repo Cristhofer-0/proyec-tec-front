@@ -15,7 +15,7 @@ interface UserState {
   clearUser: () => void
 }
 
-const socket = io(`${API_BASE_URL}`);
+const socket = io("https://backend-joinwithus-production.up.railway.app");
 
 export const useUserStore = create<UserState>((set) => {
   let storedUser = null;
