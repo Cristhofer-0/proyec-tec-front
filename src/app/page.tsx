@@ -49,7 +49,9 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            {eventosFiltrados.slice(0, 3).map((evento, index) => (
+            {eventosFiltrados
+             .filter((evento) => evento.estado !== "draft")
+            .slice(0, 3).map((evento, index) => (
               <Card key={index} className="overflow-hidden border-none shadow-lg">
                 <div className="relative h-48">
                   <Image
@@ -84,7 +86,9 @@ export default async function Home() {
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-            {eventos.slice(3, 6).map((evento, index) => (
+            {eventos
+             .filter((evento) => evento.estado !== "draft")
+            .slice(3, 6).map((evento, index) => (
               <Card key={index} className="overflow-hidden transition-all hover:shadow-lg">
                 <div className="relative h-48">
                   <Image

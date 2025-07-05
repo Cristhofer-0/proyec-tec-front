@@ -1,14 +1,13 @@
 "use client"
-import Image from "next/image"
+
+import type React from "react"
 import { useState } from "react"
 import {
   User,
   Settings,
-  CreditCard,
   ChevronRight,
   LogOut,
   ShoppingBag,
-  HelpCircle,
   Package,
   Mail,
   ArrowLeft,
@@ -16,7 +15,6 @@ import {
   EyeOff,
   X,
 } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -25,35 +23,24 @@ import { Separator } from "@/components/ui/separator"
 import { useEffect } from "react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { validarSesion, cerrarSesion as cerrarSesionService, cambiarPassword } from "@/services/usuarios"
-import { obtenerHistorialDeOrdenes } from "@/services/ordenes";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose } from "@/components/ui/dialog";
-
-import { OrderMapped } from "@/components/types/carrito"
+import { obtenerHistorialDeOrdenes } from "@/services/ordenes"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import type { OrderMapped } from "@/components/types/carrito"
 import EventoDialog from "@/components/custom/pdf/EventoDialog"
-import ChangePasswordForm from "@/components/principales/ChangePasswordForm"
 import { editarUsuarioPerfil } from "@/services/usuarios"
 import { toast } from "sonner"
-import { useUserStore } from "@/stores/userStore";
-
-interface Notificacion {
-  id: string
-  titulo: string
-  mensaje: string
-  fecha: Date
-  leida: boolean
-  tipo: "evento" | "sistema" | "promocion"
-}
+import { useUserStore } from "@/stores/userStore"
+import { useNotifications } from "@/components/principales/NotificationsContext"
 
 export default function ProfilePage() {
-  const [activeSection, setActiveSection] = useState("purchases");
-  const [comprados, setComprados] = useState<OrderMapped[]>([]);
+  const [activeSection, setActiveSection] = useState("purchases")
+  const [comprados, setComprados] = useState<OrderMapped[]>([])
   const router = useRouter()
-  const [usuario, setUsuario] = useState<{ fullName: string; email: string; userId: string } | null>(null);
+  const [usuario, setUsuario] = useState<{ fullName: string; email: string; userId: string } | null>(null)
   const [perfilEditable, setPerfilEditable] = useState({
     fullName: "",
-    email: "",// opcional si quieres agregarlo
+    email: "",
   })
   const [showPasswordChange, setShowPasswordChange] = useState(false)
   const [passwordData, setPasswordData] = useState({
@@ -67,115 +54,61 @@ export default function ProfilePage() {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const [showSuccessDialogPassword, setShowSuccessDialogPassword] = useState(false)
   const [showSuccessDialogProfile, setShowSuccessDialogProfile] = useState(false)
-  const [notificaciones, setNotificaciones] = useState<Notificacion[]>([])
+  const [paginaActual, setPaginaActual] = useState(1)
+  const [notificacionesPorPagina] = useState(3) // 5 notificaciones por página
 
-
-  // 🔢 Contar notificaciones no leídas
-  const notificacionesNoLeidas = notificaciones.filter((n) => !n.leida).length
-
-  // ✅ Marcar notificación como leída
-  const marcarComoLeida = (id: string) => {
-    setNotificaciones((prev) => {
-      const actualizadas = prev.map((notif) =>
-        notif.id === id ? { ...notif, leida: true } : notif
-      );
-      localStorage.setItem("notificaciones", JSON.stringify(actualizadas));
-      return actualizadas;
-    });
-  };
-
-
-  // ✅ Marcar todas como leídas
-  const marcarTodasComoLeidas = () => {
-    setNotificaciones((prev) => {
-      const actualizadas = prev.map((notif) => ({ ...notif, leida: true }));
-      localStorage.setItem("notificaciones", JSON.stringify(actualizadas));
-      return actualizadas;
-    });
-  };
-
-  // ✅ Eliminar notificación
-  const eliminarNotificacion = (id: string) => {
-    setNotificaciones((prev) => {
-      const actualizadas = prev.filter((notif) => notif.id !== id);
-      localStorage.setItem("notificaciones", JSON.stringify(actualizadas));
-      return actualizadas;
-    });
-  };
-
-  const formatearFecha = (fecha: Date) => {
-    const ahora = new Date()
-    const diferencia = ahora.getTime() - fecha.getTime()
-    const minutos = Math.floor(diferencia / (1000 * 60))
-    const horas = Math.floor(diferencia / (1000 * 60 * 60))
-    const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24))
-
-    if (minutos < 60) {
-      return `Hace ${minutos} min`
-    } else if (horas < 24) {
-      return `Hace ${horas}h`
-    } else {
-      return `Hace ${dias}d`
-    }
-  }
-
+  // Usar el contexto de notificaciones
+  const {
+    notificaciones,
+    notificacionesNoLeidas,
+    marcarComoLeida,
+    marcarTodasComoLeidas,
+    eliminarNotificacion,
+    formatearFecha,
+  } = useNotifications()
 
   useEffect(() => {
     async function checkSesion() {
-      const res = await validarSesion();
+      const res = await validarSesion()
       if (!res || !res.user) {
-        router.push("/usuario/login");
+        router.push("/usuario/login")
       } else {
         setUsuario({
           fullName: res.user.fullName,
           email: res.user.email,
           userId: res.user.userId,
-        });
+        })
         setPerfilEditable({
           fullName: res.user.fullName,
           email: res.user.email,
-        });
+        })
       }
     }
 
-    checkSesion();
-  }, [router]);
-
-useEffect(() => {
-  const notificacionesGuardadas = localStorage.getItem("notificaciones");
-  if (notificacionesGuardadas) {
-    try {
-      const parsed: Notificacion[] = JSON.parse(notificacionesGuardadas);
-      setNotificaciones(parsed);
-    } catch (error) {
-      console.error("Error al parsear notificaciones del localStorage", error);
-    }
-  }
-}, []);
+    checkSesion()
+  }, [router])
 
   useEffect(() => {
     async function cargarComprados() {
-      const ordenes = await obtenerHistorialDeOrdenes();
-      if (ordenes) setComprados(ordenes);
+      const ordenes = await obtenerHistorialDeOrdenes()
+      if (ordenes) setComprados(ordenes)
     }
 
-    cargarComprados();
-  }, []);
+    cargarComprados()
+  }, [])
 
   async function cerrarSesion() {
-    const clearUser = useUserStore.getState().clearUser; // limpia el store y el localStorage
-    const ok = await cerrarSesionService(); // llamada al backend
-
+    const clearUser = useUserStore.getState().clearUser
+    const ok = await cerrarSesionService()
     if (ok) {
-      clearUser();
-      sessionStorage.setItem("logout", "true");
-
-      router.push("/usuario/login"); // usa el hook ya declarado arriba
+      clearUser()
+      sessionStorage.setItem("logout", "true")
+      router.push("/usuario/login")
       setTimeout(() => {
-        window.location.reload();
-      }, 100);
+        window.location.reload()
+      }, 100)
     } else {
-      console.error("Error al cerrar sesión");
+      console.error("Error al cerrar sesión")
     }
   }
 
@@ -212,8 +145,6 @@ useEffect(() => {
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
       })
-
-
       toast.success("Contraseña actualizada correctamente")
       setShowConfirmDialog(true)
       handleCancelPasswordChange()
@@ -224,7 +155,6 @@ useEffect(() => {
 
   async function confirmarCambioDePassword() {
     setShowConfirmDialog(false)
-
     if (!usuario?.userId) {
       return toast.error("No se pudo obtener el usuario")
     }
@@ -235,8 +165,7 @@ useEffect(() => {
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
       })
-
-      setShowSuccessDialogPassword(true) // Mostrar popup de éxito
+      setShowSuccessDialogPassword(true)
       handleCancelPasswordChange()
     } catch (error) {
       toast.error("Error al cambiar la contraseña")
@@ -245,7 +174,7 @@ useEffect(() => {
 
   async function handleGuardarCambios() {
     if (!usuario?.userId) {
-      return toast.error("No se pudo obtener el usuario");
+      return toast.error("No se pudo obtener el usuario")
     }
 
     try {
@@ -253,11 +182,10 @@ useEffect(() => {
         userId: usuario.userId,
         fullName: perfilEditable.fullName,
         email: perfilEditable.email,
-      });
-
-      setShowSuccessDialogProfile(true); // <-- Mostramos el popup
+      })
+      setShowSuccessDialogProfile(true)
     } catch (error) {
-      toast.error("Error al guardar los cambios");
+      toast.error("Error al guardar los cambios")
     }
   }
 
@@ -275,12 +203,12 @@ useEffect(() => {
                 </div>
               </CardHeader>
               <CardContent>
-
                 <nav className="space-y-1">
                   <button
                     onClick={() => setActiveSection("account")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "account" ? "bg-purple-50 text-purple-600" : ""
-                      }`}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
+                      activeSection === "account" ? "bg-purple-50 text-purple-600" : ""
+                    }`}
                   >
                     <div className="flex items-center">
                       <User
@@ -290,23 +218,30 @@ useEffect(() => {
                     </div>
                     <ChevronRight className="h-4 w-4" />
                   </button>
-
                   <button
                     onClick={() => setActiveSection("notifications")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "notifications" ? "bg-purple-50 text-purple-600" : ""
-                      }`}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
+                      activeSection === "notifications" ? "bg-purple-50 text-purple-600" : ""
+                    }`}
                   >
                     <div className="flex items-center">
-                      <Mail className={`mr-3 h-5 w-5 ${activeSection === "notifications" ? "text-purple-600" : "text-gray-400"}`} />
+                      <Mail
+                        className={`mr-3 h-5 w-5 ${activeSection === "notifications" ? "text-purple-600" : "text-gray-400"}`}
+                      />
                       <span>Notificaciones</span>
+                      {notificacionesNoLeidas > 0 && (
+                        <Badge variant="destructive" className="ml-2 text-xs">
+                          {notificacionesNoLeidas}
+                        </Badge>
+                      )}
                     </div>
                     <ChevronRight className="h-4 w-4" />
                   </button>
-
                   <button
                     onClick={() => setActiveSection("purchases")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "purchases" ? "bg-purple-50 text-purple-600" : ""
-                      }`}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
+                      activeSection === "purchases" ? "bg-purple-50 text-purple-600" : ""
+                    }`}
                   >
                     <div className="flex items-center">
                       <ShoppingBag
@@ -316,11 +251,11 @@ useEffect(() => {
                     </div>
                     <ChevronRight className="h-4 w-4" />
                   </button>
-
                   <button
                     onClick={() => setActiveSection("settings")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "settings" ? "bg-purple-50 text-purple-600" : ""
-                      }`}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
+                      activeSection === "settings" ? "bg-purple-50 text-purple-600" : ""
+                    }`}
                   >
                     <div className="flex items-center">
                       <Settings
@@ -330,7 +265,6 @@ useEffect(() => {
                     </div>
                     <ChevronRight className="h-4 w-4" />
                   </button>
-
                   <Separator className="my-2" />
                   <button
                     onClick={cerrarSesion}
@@ -371,7 +305,6 @@ useEffect(() => {
                           onChange={(e) => setPerfilEditable({ ...perfilEditable, email: e.target.value })}
                         />
                       </div>
-
                     </div>
                   </div>
                   <Separator />
@@ -392,65 +325,159 @@ useEffect(() => {
                   {notificaciones.length === 0 ? (
                     <p className="text-center text-gray-500">No tienes notificaciones.</p>
                   ) : (
-                    notificaciones.map((notif) => (
-                      <div key={notif.id} className={`border p-4 rounded-md ${!notif.leida ? "bg-purple-50" : "bg-white"}`}>
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <span
-                              className={`text-xs px-2 py-1 rounded-full ${notif.tipo === "evento"
-                                ? "bg-blue-100 text-blue-800"
-                                : notif.tipo === "sistema"
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-purple-100 text-purple-800"
-                                }`}
-                            >
-                              {notif.tipo}
-                            </span>
-                            <h4 className="text-sm font-medium mt-1">{notif.titulo}</h4>
-                            <p className="text-xs text-muted-foreground">{notif.mensaje}</p>
-                            <p className="text-xs text-gray-400 mt-1">
-                              {formatearFecha(new Date(notif.fecha))}
-                            </p>
-                          </div>
-                          {!notif.leida && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => marcarComoLeida(notif.id)}
-                            >
-                              Marcar como leída
-                            </Button>
-                          )}
-                                                        <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  eliminarNotificacion(notif.id)
-                                }}
-                              >
-                                <X className="h-3 w-3" />
-                              </Button>
-                        </div>
+                    <>
+                      {/* Información de paginación */}
+                      <div className="flex justify-between items-center text-sm text-gray-600 mb-4">
+                        <span>
+                          Mostrando {Math.min((paginaActual - 1) * notificacionesPorPagina + 1, notificaciones.length)}{" "}
+                          - {Math.min(paginaActual * notificacionesPorPagina, notificaciones.length)} de{" "}
+                          {notificaciones.length} notificaciones
+                        </span>
+                        {notificacionesNoLeidas > 0 && (
+                          <span className="text-purple-600 font-medium">{notificacionesNoLeidas} sin leer</span>
+                        )}
                       </div>
-                    ))
-                  )}
-                  {notificaciones.length > 0 && (
-                    <div className="flex justify-end">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={marcarTodasComoLeidas}
-                      >
-                        Marcar todas como leídas
-                      </Button>
-                    </div>
+
+                      {/* Lista de notificaciones paginadas */}
+                      <div className="space-y-3">
+                        {notificaciones
+                          .slice((paginaActual - 1) * notificacionesPorPagina, paginaActual * notificacionesPorPagina)
+                          .map((notif) => (
+                            <div
+                              key={notif.id}
+                              className={`border p-4 rounded-md ${!notif.leida ? "bg-purple-50" : "bg-white"}`}
+                            >
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <span
+                                      className={`text-xs px-2 py-1 rounded-full ${
+                                        notif.tipo === "evento"
+                                          ? "bg-blue-100 text-blue-800"
+                                          : notif.tipo === "sistema"
+                                            ? "bg-green-100 text-green-800"
+                                            : "bg-purple-100 text-purple-800"
+                                      }`}
+                                    >
+                                      {notif.tipo}
+                                    </span>
+                                    {!notif.leida && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
+                                  </div>
+                                  <h4 className="text-sm font-medium mt-1">{notif.titulo}</h4>
+                                  <p className="text-xs text-muted-foreground">{notif.mensaje}</p>
+                                  <p className="text-xs text-gray-400 mt-1">{formatearFecha(new Date(notif.fecha))}</p>
+                                </div>
+                                <div className="flex items-center gap-2 ml-4">
+                                  {!notif.leida && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => marcarComoLeida(notif.id)}
+                                      className="text-xs"
+                                    >
+                                      Marcar como leída
+                                    </Button>
+                                  )}
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      eliminarNotificacion(notif.id)
+                                      // Ajustar página si se elimina la última notificación de la página actual
+                                      const totalPaginas = Math.ceil(
+                                        (notificaciones.length - 1) / notificacionesPorPagina,
+                                      )
+                                      if (paginaActual > totalPaginas && totalPaginas > 0) {
+                                        setPaginaActual(totalPaginas)
+                                      }
+                                    }}
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+
+                      {/* Controles de paginación */}
+                      {Math.ceil(notificaciones.length / notificacionesPorPagina) > 1 && (
+                        <div className="flex items-center justify-between pt-4 border-t">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 1))}
+                            disabled={paginaActual === 1}
+                          >
+                            Anterior
+                          </Button>
+
+                          <div className="flex items-center gap-2">
+                            {Array.from(
+                              { length: Math.ceil(notificaciones.length / notificacionesPorPagina) },
+                              (_, i) => i + 1,
+                            )
+                              .filter((page) => {
+                                // Mostrar solo algunas páginas alrededor de la actual
+                                const totalPaginas = Math.ceil(notificaciones.length / notificacionesPorPagina)
+                                if (totalPaginas <= 7) return true
+                                if (page === 1 || page === totalPaginas) return true
+                                if (page >= paginaActual - 1 && page <= paginaActual + 1) return true
+                                return false
+                              })
+                              .map((page, index, array) => (
+                                <div key={page} className="flex items-center">
+                                  {index > 0 && array[index - 1] !== page - 1 && (
+                                    <span className="px-2 text-gray-400">...</span>
+                                  )}
+                                  <Button
+                                    variant={paginaActual === page ? "default" : "ghost"}
+                                    size="sm"
+                                    onClick={() => setPaginaActual(page)}
+                                    className="w-8 h-8 p-0"
+                                  >
+                                    {page}
+                                  </Button>
+                                </div>
+                              ))}
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              setPaginaActual((prev) =>
+                                Math.min(prev + 1, Math.ceil(notificaciones.length / notificacionesPorPagina)),
+                              )
+                            }
+                            disabled={paginaActual === Math.ceil(notificaciones.length / notificacionesPorPagina)}
+                          >
+                            Siguiente
+                          </Button>
+                        </div>
+                      )}
+
+                      {/* Acciones globales */}
+                      <div className="flex justify-between items-center pt-4 border-t">
+                        <div className="text-sm text-gray-500">
+                          Página {paginaActual} de {Math.ceil(notificaciones.length / notificacionesPorPagina)}
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={marcarTodasComoLeidas}
+                          disabled={notificacionesNoLeidas === 0}
+                        >
+                          Marcar todas como leídas
+                        </Button>
+                      </div>
+                    </>
                   )}
                 </CardContent>
               </Card>
             )}
-
 
             {activeSection === "purchases" && (
               <Card>
@@ -474,9 +501,7 @@ useEffect(() => {
                           <Badge variant={new Date(item.date) < new Date() ? "default" : "outline"}>
                             {new Date(item.date) < new Date() ? "Válido" : "No válido"}
                           </Badge>
-
                         </div>
-
                         <div className="flex items-center gap-4 mt-4">
                           <div className="h-16 w-16 bg-gray-100 rounded-md flex items-center justify-center">
                             <Package className="h-8 w-8 text-gray-400" />
@@ -487,55 +512,13 @@ useEffect(() => {
                               Cantidad: {item.quantity} - Precio total: S/{item.totalPrice}
                             </p>
                           </div>
-                          <Dialog >
+                          <Dialog>
                             <EventoDialog id={item.id.toString()}></EventoDialog>
                           </Dialog>
                         </div>
-
                       </div>
                     ))
                   )}
-                </CardContent>
-
-              </Card>
-            )}
-
-            {activeSection === "payment" && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Métodos de pago</CardTitle>
-                  <CardDescription>Gestiona tus tarjetas y métodos de pago</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="border rounded-lg p-4 relative">
-                    <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <CreditCard className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="font-medium">Visa terminada en 4242</p>
-                        <p className="text-sm text-gray-500">Expira: 12/25</p>
-                      </div>
-                    </div>
-                    <Badge className="absolute top-4 right-4">Predeterminada</Badge>
-                  </div>
-
-                  <div className="border rounded-lg p-4">
-                    <div className="flex items-center gap-4">
-                      <div className="h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center">
-                        <CreditCard className="h-5 w-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <p className="font-medium">Mastercard terminada en 8888</p>
-                        <p className="text-sm text-gray-500">Expira: 09/26</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Button className="w-full" variant="outline">
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Añadir nuevo método de pago
-                  </Button>
                 </CardContent>
               </Card>
             )}
@@ -547,9 +530,7 @@ useEffect(() => {
                   <CardDescription>Gestiona tus preferencias y configuración de la cuenta</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-
                   <Separator />
-
                   <div className="space-y-4">
                     <h3 className="text-sm font-medium">Seguridad</h3>
                     {!showPasswordChange ? (
@@ -559,12 +540,16 @@ useEffect(() => {
                     ) : (
                       <div className="border rounded-lg p-6 bg-gray-50">
                         <div className="flex items-center gap-2 mb-4">
-                          <Button variant="ghost" size="sm" onClick={handleCancelPasswordChange} className="p-1 h-8 w-8">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleCancelPasswordChange}
+                            className="p-1 h-8 w-8"
+                          >
                             <ArrowLeft className="h-4 w-4" />
                           </Button>
                           <h4 className="text-lg font-medium">Cambiar contraseña</h4>
                         </div>
-
                         <form onSubmit={handlePasswordSubmit} className="space-y-4">
                           <div className="space-y-2">
                             <Label htmlFor="current-password">Contraseña actual</Label>
@@ -588,7 +573,6 @@ useEffect(() => {
                               </Button>
                             </div>
                           </div>
-
                           <div className="space-y-2">
                             <Label htmlFor="new-password">Nueva contraseña</Label>
                             <div className="relative">
@@ -613,7 +597,6 @@ useEffect(() => {
                             </div>
                             <p className="text-xs text-gray-500">La contraseña debe tener al menos 8 caracteres</p>
                           </div>
-
                           <div className="space-y-2">
                             <Label htmlFor="confirm-password">Confirmar nueva contraseña</Label>
                             <div className="relative">
@@ -636,7 +619,6 @@ useEffect(() => {
                               </Button>
                             </div>
                           </div>
-
                           <div className="flex gap-2 pt-4">
                             <Button type="submit" size="sm">
                               Actualizar contraseña
@@ -656,7 +638,6 @@ useEffect(() => {
         </div>
       </main>
 
-
       {/* Popup de confirmación */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent>
@@ -667,7 +648,9 @@ useEffect(() => {
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2 mt-4">
-            <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>Cancelar</Button>
+            <Button variant="outline" onClick={() => setShowConfirmDialog(false)}>
+              Cancelar
+            </Button>
             <Button onClick={confirmarCambioDePassword}>Confirmar</Button>
           </div>
         </DialogContent>
@@ -678,9 +661,7 @@ useEffect(() => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Contraseña actualizada</DialogTitle>
-            <DialogDescription>
-              Tu contraseña se ha cambiado exitosamente.
-            </DialogDescription>
+            <DialogDescription>Tu contraseña se ha cambiado exitosamente.</DialogDescription>
           </DialogHeader>
           <div className="flex justify-end mt-4">
             <Button onClick={() => setShowSuccessDialogPassword(false)}>Aceptar</Button>

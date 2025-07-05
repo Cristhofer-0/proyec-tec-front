@@ -3,6 +3,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster"
 import { CarritoProvider } from '@/components/principales/CarritoContext'; // Ajusta la ruta
 import ClientApp from "@/components/principales/ClientApp";
+import { NotificationsProvider } from "@/components/principales/NotificationsContext"; // Ajusta la ruta
 
 export const metadata: Metadata = {
   title: "Joint With Us | Los mejores eventos de la comunidad",
@@ -21,11 +22,13 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body>
-        <CarritoProvider>
-           <ClientApp>
-          {children}
-          </ClientApp>
-        </CarritoProvider>
+        <NotificationsProvider>
+          <CarritoProvider>
+            <ClientApp>
+              {children}
+            </ClientApp>
+          </CarritoProvider>
+        </NotificationsProvider>
       </body>
     </html>
   );
