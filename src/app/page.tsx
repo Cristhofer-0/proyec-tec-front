@@ -1,40 +1,61 @@
-import type { Metadata } from "next";
-import Link from "next/link"
-import Image from "next/image"
-import Eventos from "./carrusel-eventos/page";
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+
+// Iconos
 import {
-  ChevronLeft,
-  ChevronRight,
   Calendar,
   MapPin,
   Clock,
-  Star,
-  ShoppingCart,
-  Search,
-  Menu,
-  User,
   Tag,
-} from "lucide-react"
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { fetchEventos } from "@/services/eventos"
-import { formatearFecha } from "@/components/types/Fechas"
+// Componentes UI
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
+// Servicios y utilidades
+import { fetchEventos } from "@/services/eventos";
+import { formatearFecha } from "@/components/types/Fechas";
 
-export default async function Home() {
-  const eventos = await fetchEventos()
+// Carrusel de eventos
+import Eventos from "./carrusel-eventos/page";
 
-    const eventosFiltrados = eventos.filter(
+// Tipado
+type Evento = {
+  id: string;
+  titulo: string;
+  descripcion: string;
+  estado?: string;
+  bannerUrl?: string;
+  fechaInicio?: string;
+  fechaFinalizacion?: string;
+  direccion?: string;
+  categorias?: string[] | string;
+};
+
+export default function Home() {
+  const [eventos, setEventos] = useState<Evento[]>([]);
+
+  useEffect(() => {
+    const obtenerEventos = async () => {
+      const data = await fetchEventos();
+      setEventos(data.map((item: any) => ({ ...item, id: String(item.id) })));
+    };
+
+    obtenerEventos();
+  }, []);
+
+  const eventosFiltrados = eventos.filter(
     (evento) => evento.estado?.toLowerCase() === "published"
   );
 
-
   return (
     <main className="flex-1">
-      <Eventos  />
+      <Eventos />
 
       {/* Categorías */}
       <section className="py-12 bg-gradient-to-b from-white to-purple-50">
@@ -49,9 +70,7 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            {eventosFiltrados
-             .filter((evento) => evento.estado !== "draft")
-            .slice(0, 3).map((evento, index) => (
+            {eventosFiltrados.slice(0, 3).map((evento, index) => (
               <Card key={index} className="overflow-hidden border-none shadow-lg">
                 <div className="relative h-48">
                   <Image
@@ -74,7 +93,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Próximos Eventos */}
+      {/* Nuestros Eventos */}
       <section className="py-12 bg-white">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -86,9 +105,7 @@ export default async function Home() {
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-            {eventos
-             .filter((evento) => evento.estado !== "draft")
-            .slice(3, 6).map((evento, index) => (
+            {eventosFiltrados.slice(3, 6).map((evento, index) => (
               <Card key={index} className="overflow-hidden transition-all hover:shadow-lg">
                 <div className="relative h-48">
                   <Image
@@ -110,7 +127,6 @@ export default async function Home() {
                   <div className="flex items-center text-gray-500 mb-1">
                     <Clock className="h-4 w-4 mr-2" />
                     <span>{evento.fechaFinalizacion ? formatearFecha(evento.fechaFinalizacion) : "Fecha no disponible"}</span>
-
                   </div>
                   <div className="flex items-center text-gray-500 mb-1">
                     <MapPin className="h-4 w-4 mr-2" />
@@ -150,9 +166,9 @@ export default async function Home() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button className="bg-white text-purple-600 hover:bg-gray-100"> 
+              <Button className="bg-white text-purple-600 hover:bg-gray-100">
                 <Link href="/solicitud-evento">Ver más información</Link>
-                </Button>
+              </Button>
             </div>
           </div>
         </div>
