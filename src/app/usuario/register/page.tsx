@@ -14,10 +14,14 @@ import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
 import { registerUser } from "@/services/usuarios"
 import { validarDNI } from "@/services/dni"
+import { validarTelefono } from "@/services/telefono"
+import { validarEmail } from "@/services/email"
 
 export default function RegisterContent() {
   const router = useRouter()
   const [dniError, setDniError] = useState("")
+  const [telefonoError, setTelefonoError] = useState("")
+  const [emailError, setEmailError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -64,6 +68,24 @@ export default function RegisterContent() {
       return
     } else {
       setDniError("")
+    }
+
+    const { valido: telefonoValido, error: errorTelefono } = await validarTelefono(formData.phone)
+    if (!telefonoValido) {
+      setTelefonoError(errorTelefono || "Teléfono inválido")
+      toast.error(errorTelefono || "Teléfono inválido")
+      return
+    } else {
+      setTelefonoError("")
+    }
+
+    const { valido: emailValido, error: errorEmail } = await validarEmail(formData.email)
+    if (!emailValido) {
+      setEmailError(errorEmail || "Correo inválido")
+      toast.error(errorEmail || "Correo inválido")
+      return
+    } else {
+      setEmailError("")
     }
 
 
@@ -157,6 +179,7 @@ export default function RegisterContent() {
                   onChange={(e) => handleInputChange("phone", e.target.value)}
                   required
                 />
+                {telefonoError && <p className="text-sm text-destructive">{telefonoError}</p>}
               </div>
 
               <div className="space-y-2">
@@ -171,6 +194,7 @@ export default function RegisterContent() {
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   required
                 />
+                {emailError && <p className="text-sm text-destructive">{emailError}</p>}
               </div>
 
               <div className="space-y-2">
