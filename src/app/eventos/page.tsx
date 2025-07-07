@@ -44,7 +44,7 @@ export default function EventosPage() {
 
         const categoriasMap = new Map()
 
-        data.flatMap((evento) => evento.categorias || []).forEach((cat) => {
+        publicados.flatMap((evento) => evento.categorias || []).forEach((cat) => {
           const catTrimmed = cat.trim()
           if (catTrimmed === "") return
 
@@ -59,7 +59,6 @@ export default function EventosPage() {
         setCategorias(Array.from(categoriasMap.values()))
       } catch (error) {
         console.error("Error fetching eventos:", error)
-        //setIsLoading(false)
       }
     }
 
