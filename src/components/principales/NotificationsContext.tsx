@@ -1,10 +1,8 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
-import { obtenerNotificacionesDB } from "@/services/notificaciones";
+import { obtenerNotificacionesDB, marcarNotificacionLeidaDB, marcarTodasNotificacionesLeidasDB, eliminarNotificacionDB } from "@/services/notificaciones";
 import { useUserStore } from "@/stores/userStore";
-import { marcarNotificacionLeidaDB } from "@/services/notificaciones";
-import { marcarTodasNotificacionesLeidasDB } from "@/services/notificaciones";
-import { eliminarNotificacionDB } from "@/services/notificaciones";
+import { socket } from "@/lib/socket"; // ✅ Usamos el socket compartido
 
 // Tipos
 interface Notification {
@@ -32,41 +30,61 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
   const [notificaciones, setNotificaciones] = useState<Notification[]>([]);
-  const [initialized, setInitialized] = useState(false); // ✅ evitar bucles infinitos
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     const cargarUsuarioYNotificaciones = async () => {
-      let userId = user?.id || user?.id;
+      let userId = user?.id || user?.UserId;
 
       if (!userId) {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
-          console.log("👤 Usuario cargado desde localStorage en NotificationsProvider:", parsedUser);
+          console.log("👤 Usuario cargado desde localStorage:", parsedUser);
           setUser(parsedUser);
           userId = parsedUser.UserId || parsedUser.id;
         }
       }
 
-      console.log("🔄 Cargando notificaciones para el usuario:", userId);
-
       if (userId) {
         const notis = await obtenerNotificacionesDB(userId.toString());
-        console.log("📥 Notificaciones recibidas:", notis);
         setNotificaciones(notis);
         localStorage.setItem("notificaciones", JSON.stringify(notis));
       } else {
-        console.warn("⚠️ No hay usuario aún, no se cargan notificaciones.");
+        console.warn("⚠️ Usuario no definido, no se cargan notificaciones.");
       }
 
-      setInitialized(true); // ✅ evitar repetir ejecución
+      setInitialized(true);
     };
 
-    // solo ejecuta si no se inicializó ya
     if (!initialized) {
       cargarUsuarioYNotificaciones();
     }
-  }, [initialized]); // ✅ evitar bucles al no depender directamente de `user`
+  }, [initialized]);
+
+  useEffect(() => {
+    const userId = user?.UserId || user?.id;
+    if (!userId) return;
+
+    console.log("🔧 Socket conectado para userId:", userId);
+
+    socket.emit("joinRoom", userId);
+
+    const handleNuevaNotificacion = (nuevaNoti: Notification) => {
+      console.log("🔔 Notificación en tiempo real:", nuevaNoti);
+      setNotificaciones((prev) => {
+        const actualizadas = [nuevaNoti, ...prev];
+        localStorage.setItem("notificaciones", JSON.stringify(actualizadas));
+        return actualizadas;
+      });
+    };
+
+    socket.on("nuevaNotificacion", handleNuevaNotificacion);
+
+    return () => {
+      socket.off("nuevaNotificacion", handleNuevaNotificacion);
+    };
+  }, [user]);
 
   const notificacionesNoLeidas = notificaciones.filter((n) => !n.IsRead).length;
 
@@ -86,21 +104,16 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   };
 
   const marcarTodasComoLeidas = async () => {
-    const userId = user?.UserId || user?.id; // <- asegúrate que no sea undefined
-    console.log("🧪 marcando todas como leídas para userId:", userId);
-
+    const userId = user?.UserId || user?.id;
     if (!userId) return;
 
     const ok = await marcarTodasNotificacionesLeidasDB(userId);
-    console.log("🧪 resultado de marcarTodasNotificacionesLeidasDB:", ok);
-
     if (ok) {
       const actualizadas = notificaciones.map((n) => ({ ...n, IsRead: true }));
       setNotificaciones(actualizadas);
       localStorage.setItem("notificaciones", JSON.stringify(actualizadas));
     }
   };
-
 
   const eliminarNotificacion = async (id: number) => {
     const ok = await eliminarNotificacionDB(id);
