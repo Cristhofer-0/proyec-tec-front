@@ -2,15 +2,6 @@ import { Document, Page, Text, View, Image } from "@react-pdf/renderer"
 import { styles } from "../../types/styles"
 import logo from "../../../../public/images/logo-joinwithus.png"
 
-// Register fonts (optional - you would need to provide these font files)
-// Font.register({
-//   family: 'Montserrat',
-//   fonts: [
-//     { src: '/fonts/Montserrat-Regular.ttf' },
-//     { src: '/fonts/Montserrat-Bold.ttf', fontWeight: 'bold' },
-//   ],
-// })
-
 interface Evento {
   id: string
   titulo: string
@@ -24,19 +15,22 @@ interface Evento {
   organizador?: string
 }
 
-function formatFecha(fechaIso: string, incluirHora = false): string {
-  if (!fechaIso) return "Fecha no disponible"
+function formatFechaManual(fecha: string, incluirHora = false): string {
+  if (!fecha) return "Fecha no disponible"
 
-  const [fecha, tiempo] = fechaIso.split("T") // "2025-07-26", "00:00:00.000Z"
-  const [anio, mes, dia] = fecha.split("-")
+  // Normaliza el formato para que lo entienda Date
+  const fechaIso = fecha.includes("T") ? fecha : fecha.replace(" ", "T")
+  const date = new Date(fechaIso)
 
-  if (!incluirHora || !tiempo) {
-    return `${dia}/${mes}/${anio}`
-  }
+  if (isNaN(date.getTime())) return "Fecha inválida"
 
-  const [hora, minuto] = tiempo.split(":") // Ignoramos segundos y milisegundos
+  const dia = String(date.getDate()).padStart(2, "0")
+  const mes = String(date.getMonth() + 1).padStart(2, "0")
+  const anio = date.getFullYear()
+  const hora = String(date.getHours()).padStart(2, "0")
+  const minuto = String(date.getMinutes()).padStart(2, "0")
 
-  return `${dia}/${mes}/${anio} ${hora}:${minuto}`
+  return incluirHora ? `${dia}/${mes}/${anio} ${hora}:${minuto}` : `${dia}/${mes}/${anio}`
 }
 
 export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni, quantity }: { evento: Evento; qrBase64?: string, orderId?: number, orderDate?: string, fullName?: string, dni?: string, quantity?: number }) => {
@@ -62,7 +56,7 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni,
           <View style={styles.headerTextContainer}>
             <Text style={styles.headerTitle}>{titulo}</Text>
             <Text style={styles.headerSubtitle}>
-              {formatFecha(fechaInicio)} - {formatFecha(fechaFinalizacion)}
+              {formatFechaManual(fechaInicio)} - {formatFechaManual(fechaFinalizacion)}
             </Text>
           </View>
         </View>
@@ -81,7 +75,7 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni,
 
             <View style={styles.eventIdBox}>
               <Text style={styles.eventIdLabel}>Fecha de la Orden</Text>
-              <Text style={styles.eventIdText}>{formatFecha(orderDate || "", true)}</Text>
+              <Text style={styles.eventIdText}>{formatFechaManual(orderDate || "", true)}</Text>
             </View>
           </View>
         )}
@@ -119,12 +113,12 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni,
             {/* Más contenido del PDF aquí... */}
             <View style={styles.section}>
               <Text style={styles.label}>Fecha de Inicio:</Text>
-             <Text style={styles.text}>{formatFecha(fechaInicio, true)}</Text>
+             <Text style={styles.text}>{formatFechaManual(fechaInicio, true)}</Text>
             </View>
 
             <View style={styles.section}>
               <Text style={styles.label}>Fecha de Fin:</Text>
-              <Text style={styles.text}>{formatFecha(fechaFinalizacion, true)}</Text>
+              <Text style={styles.text}>{formatFechaManual(fechaFinalizacion, true)}</Text>
             </View>
 
             <View style={styles.section}>
@@ -158,14 +152,6 @@ export const EventoPDF = ({ evento, qrBase64, orderId, orderDate, fullName, dni,
                   </Text>
                 ))}
               </View>
-            </View>
-          )}
-
-          {/* Description */}
-          {descripcion && (
-            <View style={styles.sectionFull}>
-              <Text style={[styles.label, { marginBottom: 5 }]}>Descripción:</Text>
-              <Text style={styles.descriptionText}>{descripcion}</Text>
             </View>
           )}
 
