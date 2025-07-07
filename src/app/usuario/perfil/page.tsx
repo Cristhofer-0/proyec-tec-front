@@ -14,6 +14,7 @@ import {
   Eye,
   EyeOff,
   X,
+  CheckCircle,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -64,7 +65,6 @@ export default function ProfilePage() {
     marcarComoLeida,
     marcarTodasComoLeidas,
     eliminarNotificacion,
-    formatearFecha,
   } = useNotifications()
 
   useEffect(() => {
@@ -206,9 +206,8 @@ export default function ProfilePage() {
                 <nav className="space-y-1">
                   <button
                     onClick={() => setActiveSection("account")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
-                      activeSection === "account" ? "bg-purple-50 text-purple-600" : ""
-                    }`}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "account" ? "bg-purple-50 text-purple-600" : ""
+                      }`}
                   >
                     <div className="flex items-center">
                       <User
@@ -220,9 +219,8 @@ export default function ProfilePage() {
                   </button>
                   <button
                     onClick={() => setActiveSection("notifications")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
-                      activeSection === "notifications" ? "bg-purple-50 text-purple-600" : ""
-                    }`}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "notifications" ? "bg-purple-50 text-purple-600" : ""
+                      }`}
                   >
                     <div className="flex items-center">
                       <Mail
@@ -239,9 +237,8 @@ export default function ProfilePage() {
                   </button>
                   <button
                     onClick={() => setActiveSection("purchases")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
-                      activeSection === "purchases" ? "bg-purple-50 text-purple-600" : ""
-                    }`}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "purchases" ? "bg-purple-50 text-purple-600" : ""
+                      }`}
                   >
                     <div className="flex items-center">
                       <ShoppingBag
@@ -253,9 +250,8 @@ export default function ProfilePage() {
                   </button>
                   <button
                     onClick={() => setActiveSection("settings")}
-                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${
-                      activeSection === "settings" ? "bg-purple-50 text-purple-600" : ""
-                    }`}
+                    className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 hover:text-purple-600 ${activeSection === "settings" ? "bg-purple-50 text-purple-600" : ""
+                      }`}
                   >
                     <div className="flex items-center">
                       <Settings
@@ -339,68 +335,62 @@ export default function ProfilePage() {
                       </div>
 
                       {/* Lista de notificaciones paginadas */}
-                      <div className="space-y-3">
-                        {notificaciones
-                          .slice((paginaActual - 1) * notificacionesPorPagina, paginaActual * notificacionesPorPagina)
-                          .map((notif) => (
-                            <div
-                              key={notif.id}
-                              className={`border p-4 rounded-md ${!notif.leida ? "bg-purple-50" : "bg-white"}`}
-                            >
-                              <div className="flex justify-between items-start">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <span
-                                      className={`text-xs px-2 py-1 rounded-full ${
-                                        notif.tipo === "evento"
-                                          ? "bg-blue-100 text-blue-800"
-                                          : notif.tipo === "sistema"
-                                            ? "bg-green-100 text-green-800"
-                                            : "bg-purple-100 text-purple-800"
-                                      }`}
-                                    >
-                                      {notif.tipo}
-                                    </span>
-                                    {!notif.leida && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
-                                  </div>
-                                  <h4 className="text-sm font-medium mt-1">{notif.titulo}</h4>
-                                  <p className="text-xs text-muted-foreground">{notif.mensaje}</p>
-                                  <p className="text-xs text-gray-400 mt-1">{formatearFecha(new Date(notif.fecha))}</p>
-                                </div>
-                                <div className="flex items-center gap-2 ml-4">
-                                  {!notif.leida && (
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => marcarComoLeida(notif.id)}
-                                      className="text-xs"
-                                    >
-                                      Marcar como leída
-                                    </Button>
-                                  )}
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6"
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      eliminarNotificacion(notif.id)
-                                      // Ajustar página si se elimina la última notificación de la página actual
-                                      const totalPaginas = Math.ceil(
-                                        (notificaciones.length - 1) / notificacionesPorPagina,
-                                      )
-                                      if (paginaActual > totalPaginas && totalPaginas > 0) {
-                                        setPaginaActual(totalPaginas)
-                                      }
-                                    }}
-                                  >
-                                    <X className="h-3 w-3" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                      </div>
+<div className="space-y-4">
+  {notificaciones
+    .slice((paginaActual - 1) * notificacionesPorPagina, paginaActual * notificacionesPorPagina)
+    .map((notif) => (
+      <div
+        key={notif.NotificationId}
+        className={`flex items-start justify-between border rounded-lg p-4 shadow-sm transition-all duration-300 ${
+          !notif.IsRead ? "bg-blue-50 border-blue-200" : "bg-white"
+        }`}
+      >
+        <div className="flex-1 pr-4">
+          <div className="flex items-center gap-2 mb-2">
+            {!notif.IsRead && (
+              <span className="inline-flex items-center gap-1 text-blue-600 text-xs font-semibold">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                Nueva notificación
+              </span>
+            )}
+          </div>
+          <p className="text-sm text-gray-800">{notif.Message}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {!notif.IsRead && (
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-7 w-7 text-green-600 hover:bg-green-100"
+              onClick={() => marcarComoLeida(notif.NotificationId)}
+              title="Marcar como leída"
+            >
+              <CheckCircle className="w-4 h-4" />
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-7 w-7 text-red-600 hover:bg-red-100"
+            onClick={(e) => {
+              e.stopPropagation();
+              eliminarNotificacion(notif.NotificationId);
+              const totalPaginas = Math.ceil(
+                (notificaciones.length - 1) / notificacionesPorPagina
+              );
+              if (paginaActual > totalPaginas && totalPaginas > 0) {
+                setPaginaActual(totalPaginas);
+              }
+            }}
+            title="Eliminar notificación"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    ))}
+</div>
+
 
                       {/* Controles de paginación */}
                       {Math.ceil(notificaciones.length / notificacionesPorPagina) > 1 && (

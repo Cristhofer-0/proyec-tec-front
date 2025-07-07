@@ -6,6 +6,7 @@ import { API_BASE_URL } from "@/lib/config"
 
 interface User {
   id: string
+  UserId?: number;
   email: string
 }
 
@@ -15,7 +16,7 @@ interface UserState {
   clearUser: () => void
 }
 
-const socket = io("https://backend-joinwithus-production.up.railway.app");
+const socket = io("http://localhost:3000");
 
 export const useUserStore = create<UserState>((set) => {
   let storedUser = null;

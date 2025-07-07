@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster"
 import { CarritoProvider } from '@/components/principales/CarritoContext'; // Ajusta la ruta
-import ClientApp from "@/components/principales/ClientApp";
 import { NotificationsProvider } from "@/components/principales/NotificationsContext"; // Ajusta la ruta
+import Header from "@/app/utils/header";
+import Footer from "@/app/utils/footer";
 
 export const metadata: Metadata = {
   title: "Joint With Us | Los mejores eventos de la comunidad",
@@ -24,11 +25,13 @@ export default function RootLayout({
       <body>
         <NotificationsProvider>
           <CarritoProvider>
-            <ClientApp>
-              {children}
-            </ClientApp>
+            <Header />
+
+            {children}
+            <Footer />
           </CarritoProvider>
         </NotificationsProvider>
+        <Toaster />
       </body>
     </html>
   );

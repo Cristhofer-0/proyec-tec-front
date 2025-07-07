@@ -30,23 +30,26 @@ const Header: React.FC = () => {
   const setUser = useUserStore((state) => state.setUser)
   const { cantidad, actualizarCarrito } = useCarrito()
 
-  // Usar el contexto de notificaciones
   const {
     notificaciones,
     notificacionesNoLeidas,
     marcarComoLeida,
     marcarTodasComoLeidas,
     eliminarNotificacion,
-    formatearFecha,
-    obtenerColorTipo,
   } = useNotifications()
 
   useEffect(() => {
-    const stored = localStorage.getItem("user")
+    const stored = localStorage.getItem("user");
     if (stored) {
-      setUser(JSON.parse(stored))
+      const userParsed = JSON.parse(stored);
+      console.log("👤 Usuario desde localStorage:", userParsed);
+      setUser(userParsed);
     }
-  }, [setUser])
+  }, [setUser]);
+
+  useEffect(() => {
+    console.log("🔔 Notificaciones actuales en Header:", notificaciones);
+  }, [notificaciones]);
 
   useEffect(() => {
     actualizarCarrito()
@@ -75,7 +78,6 @@ const Header: React.FC = () => {
         </nav>
 
         <div className="flex items-center gap-4">
-          {/* Notificaciones */}
           {isClient && user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -109,53 +111,53 @@ const Header: React.FC = () => {
                 <DropdownMenuSeparator />
 
                 {notificaciones.length === 0 ? (
-                  <div className="p-4 text-center text-muted-foreground">No tienes notificaciones</div>
+                  <div className="p-4 text-center text-muted-foreground text-sm">
+                    No tienes notificaciones
+                  </div>
                 ) : (
                   <ScrollArea className="h-80">
-                    {notificaciones.map((notificacion) => (
-                      <div key={notificacion.id}>
-                        <DropdownMenuItem
-                          className={`p-3 cursor-pointer ${!notificacion.leida ? "bg-muted/50" : ""}`}
-                          onClick={() => marcarComoLeida(notificacion.id)}
-                        >
-                          <div className="flex flex-col gap-1 w-full">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span
-                                    className={`text-xs px-2 py-1 rounded-full ${obtenerColorTipo(notificacion.tipo)}`}
-                                  >
-                                    {notificacion.tipo}
-                                  </span>
-                                  {!notificacion.leida && <div className="w-2 h-2 bg-blue-500 rounded-full"></div>}
-                                </div>
-                                <h4 className="font-medium text-sm leading-tight">{notificacion.titulo}</h4>
-                                <p className="text-xs text-muted-foreground mt-1 leading-tight">
-                                  {notificacion.mensaje}
-                                </p>
-                                <span className="text-xs text-muted-foreground mt-1">
-                                  {formatearFecha(notificacion.fecha)}
-                                </span>
+                    <div className="divide-y">
+                      {notificaciones.map((notificacion) => (
+                        <div key={notificacion.NotificationId}>
+                          <DropdownMenuItem
+                            className={`flex items-start justify-between gap-3 px-4 py-3 cursor-pointer transition-all rounded-md
+              ${!notificacion.IsRead ? "bg-muted/40 hover:bg-muted" : "hover:bg-accent"}
+            `}
+                            onClick={() => marcarComoLeida(notificacion.NotificationId)}
+                          >
+                            <div className="flex-1 space-y-1">
+                              <div className="flex items-center gap-2">
+                                {!notificacion.IsRead && (
+                                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                                )}
+                                <h4 className="text-sm font-medium">
+                                  {notificacion.Message || "Notificación"}
+                                </h4>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6"
-                                onClick={(e) => {
-                                  e.stopPropagation()
-                                  eliminarNotificacion(notificacion.id)
-                                }}
-                              >
-                                <X className="h-3 w-3" />
-                              </Button>
+                              {notificacion.createdAt && (
+                                <p className="text-xs text-muted-foreground">
+                                  {new Date(notificacion.createdAt).toLocaleString("es-PE")}
+                                </p>
+                              )}
                             </div>
-                          </div>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                      </div>
-                    ))}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                eliminarNotificacion(notificacion.NotificationId);
+                              }}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuItem>
+                        </div>
+                      ))}
+                    </div>
                   </ScrollArea>
                 )}
+
 
                 {notificaciones.length > 0 && (
                   <>
@@ -174,7 +176,6 @@ const Header: React.FC = () => {
             </DropdownMenu>
           )}
 
-          {/* Carrito */}
           <Button variant="ghost" size="icon" className="relative">
             <Link href="/carrito">
               <ShoppingCart className="h-5 w-5" />
@@ -186,7 +187,6 @@ const Header: React.FC = () => {
             </Link>
           </Button>
 
-          {/* Usuario */}
           {isClient && user ? (
             <Button variant="ghost" size="icon" asChild>
               <Link href="/usuario/perfil">
