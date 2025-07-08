@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const Footer: React.FC = () => {
   return (
@@ -35,6 +36,15 @@ const Footer: React.FC = () => {
               <li>+51 912 345 678</li>
               <li>Calle Esmeralda 123, Lima</li>
             </ul>
+          </div>
+          <div>
+            <Image
+                  src="/images/logonew.png"
+                  alt="JoinWithUs Logo"
+                  width={150}
+                  height={150}
+                  className="rounded"
+                />
           </div>
         </div>
 
