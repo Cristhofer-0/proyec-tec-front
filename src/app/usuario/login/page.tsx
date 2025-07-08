@@ -35,6 +35,7 @@ export default function Login() {
   const [loading, setLoading] = useState(true); // para mostrar mientras verifica la sesión
   const [errorServidor, setErrorServidor] = useState(""); // <<< estado para error de servidor
   const valorEmail = watch("email");
+  const [cargandoLogin, setCargandoLogin] = useState(false);
 
   useEffect(() => {
     setEmailLleno((valorEmail || "").trim() !== "");
@@ -60,19 +61,22 @@ export default function Login() {
 
 
   async function verificarCorreo(data: LoginData): Promise<void> {
+    setCargandoLogin(true); // empieza a cargar
+    setErrorServidor("");
+
     try {
       const response = await loginUsuario(data.email, data.password);
       setUser(response.user);
       router.push("/");
-      setErrorServidor(""); // limpiar error al iniciar sesión con éxito
     } catch (error: any) {
       console.error("Error en verificarCorreo:", error);
-      // Mostrar mensaje de error personalizado según respuesta
       if (error?.response?.data?.message) {
         setErrorServidor(error.response.data.message);
       } else {
         setErrorServidor("La contraseña o el correo son incorrectos");
       }
+    } finally {
+      setCargandoLogin(false); // termina la carga
     }
   }
 
@@ -131,7 +135,7 @@ export default function Login() {
                   type={mostrarPassword ? "text" : "password"}
                   placeholder={emailLleno ? "Contraseña" : "Ingrese su correo electrónico primero"}
                   disabled={!emailLleno}
-                  className={`pl-10 ${!emailLleno ? "text-red-500 placeholder-red-500" : ""}`}
+                  className={`pl-10 pr-10  ${!emailLleno ? "text-red-500 placeholder-red-500" : ""}`}
                   {...register("password", {
                     required: true,
                     minLength: 6,
@@ -139,9 +143,9 @@ export default function Login() {
                   })}
                 />
                 {mostrarPassword ? (
-                  <Eye className="absolute right-3 top-3 h-4 w-4 text-gray-400 cursor-pointer" onClick={verContaseña} />
+                  <Eye className="absolute right-3 top-[10px] h-5 w-5 text-gray-400 cursor-pointer" onClick={verContaseña} />
                 ) : (
-                  <EyeOff className="absolute right-3 top-3 h-4 w-4 text-gray-400 cursor-pointer" onClick={verContaseña} />
+                  <EyeOff className="absolute right-3 top-[10px] h-5 w-5 text-gray-400 cursor-pointer" onClick={verContaseña} />
                 )}
               </div>
               {errors.password && (
@@ -160,9 +164,22 @@ export default function Login() {
             {/* RECORDAR Y OLVIDAR */}
 
 
-            <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
-              Iniciar sesión
-              <ArrowRight className="ml-2 h-4 w-4" />
+            <Button
+              type="submit"
+              className="w-full bg-purple-600 hover:bg-purple-700"
+              disabled={cargandoLogin}
+            >
+              {cargandoLogin ? (
+                <div className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Cargando...
+                </div>
+              ) : (
+                <>
+                  Iniciar sesión
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </>
+              )}
             </Button>
 
             <div className="relative">
