@@ -601,7 +601,7 @@ export default function ProfilePage() {
                             <div className="relative">
                               <Input
                                 id="confirm-password"
-                                type={showConfirmPassword ? "text" : "password"}
+                                //type={showConfirmPassword ? "text" : "password"}
                                 value={passwordData.confirmPassword}
                                 onChange={(e) => handlePasswordChange("confirmPassword", e.target.value)}
                                 placeholder="Confirma tu nueva contraseña"

@@ -63,7 +63,7 @@ export default function PasswordResetForm() {
                 <MailIcon className="inline-block mr-1 h-4 w-4" />
                 {userEmail}
               </div>
-              <Button className="w-full gap-2" asChild>
+              <Button className="w-full gap-2 text-white bg-purple-600" asChild>
                 <Link href="/usuario/login">
                   <KeyIcon className="h-4 w-4" />
                   Volver al login
@@ -102,7 +102,7 @@ export default function PasswordResetForm() {
                 )}
               </div>
 
-              <Button type="submit" className="w-full gap-2" disabled={isLoading}>
+              <Button type="submit" className="w-full gap-2 text-white bg-purple-600" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <div className="h-4 w-4 animate-spin border-2 border-current border-t-transparent rounded-full" />
