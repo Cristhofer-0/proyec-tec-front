@@ -328,12 +328,7 @@ export default function RegisterContent() {
                       Acepto los{" "}
                       <Button variant="link" className="h-auto p-0 text-sm" asChild>
                         <Link href="/terminos">términos y condiciones</Link>
-                      </Button>{" "}
-                      y la{" "}
-                      <Button variant="link" className="h-auto p-0 text-sm" asChild>
-                        <Link href="/privacy">política de privacidad</Link>
                       </Button>
-                      <span className="text-destructive"> *</span>
                     </Label>
                   </div>
                 </div>

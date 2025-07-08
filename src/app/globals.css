@@ -245,6 +245,17 @@
   animation: accordion-up 0.2s ease-out;
 }
 
+.btn-purple {
+  @apply w-full text-lg py-3 rounded-md transition-colors;
+  @apply data-[state=active]:text-white;
+  @apply data-[state=inactive]:bg-white;
+  @apply data-[state=inactive]:text-gray-800;
+  @apply hover:data-[state=active]:bg-[oklch(0.56_0.25_300)];
+  @apply data-[state=active]:bg-[oklch(0.56_0.3_300)];
+  @apply dark:data-[state=inactive]:bg-white;
+}
+
+
 /* Esto oculta el icono de NextJs*/
 /*nextjs-portal {
   display: none !important;

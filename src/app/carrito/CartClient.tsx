@@ -102,7 +102,8 @@ export default function CartClient() {
                   <Ticket className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                   <h2 className="text-xl font-semibold mb-2">Tu carrito está vacío</h2>
                   <p className="text-muted-foreground mb-4">Parece que aún no has añadido tickets a tu carrito.</p>
-                  <Button asChild>
+                  <Button asChild
+                    className="text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-200">
                     <Link href="/eventos">Ver eventos disponibles</Link>
                   </Button>
                 </div>
@@ -208,7 +209,10 @@ export default function CartClient() {
                 <span>Total</span>
                 <span>S/ {producto.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}</span>
               </div>
-              <Button className="w-full mt-6" onClick={handlePagar} >Proceder al pago</Button>
+              <Button 
+                className="w-full mt-6 text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-200" 
+                onClick={handlePagar}
+              >Proceder al pago</Button>
               <Button variant="outline" className="w-full mt-2" asChild>
                 <Link href="/eventos">Continuar comprando</Link>
               </Button>

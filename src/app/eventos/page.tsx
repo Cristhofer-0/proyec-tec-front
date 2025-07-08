@@ -148,9 +148,9 @@ export default function EventosPage() {
             {filteredEventos.map((evento, index) => (
               <Card
                 key={index}
-                className="overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border-0 bg-white"
+                className="flex flex-col overflow-hidden h-full shadow-xl rounded-2xl hover:scale-[1.02] hover:shadow-2xl transition-transform duration-300 border-0"
               >
-                <div className="relative h-56">
+                <div className="relative h-56 w-full overflow-hidden rounded-t-2xl min-h-[224px]">
                   <Image
                     src={evento.bannerUrl || "/placeholder.svg?height=200&width=400"}
                     alt={evento.titulo}

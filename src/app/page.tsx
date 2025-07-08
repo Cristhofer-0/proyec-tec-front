@@ -71,8 +71,9 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
             {eventosFiltrados.slice(0, 3).map((evento, index) => (
-              <Card key={index} className="overflow-hidden border-none shadow-lg">
-                <div className="relative h-48">
+              <Card key={index} 
+                className="flex-col h-full overflow-hidden border-0 shadow-xl rounded-2xl hover:scale-[1.02] transition-transform duration-300">
+                <div className="relative h-48 w-full overflow-hidden rounded-t-2xl flex-grow min-h-[200px]">
                   <Image
                     src={evento.bannerUrl || "/placeholder.svg?height=200&width=400"}
                     alt={evento.titulo}
@@ -80,10 +81,10 @@ export default function Home() {
                     className="object-cover"
                   />
                 </div>
-                <CardContent className="p-6 bg-gradient-to-r from-purple-600 to-pink-500 text-white">
+                <CardContent className="flex flex-col flex-grow p-6 bg-gradient-to-r from-purple-600 to-pink-500 text-white relative w-full overflow-hidden rounded-b-2xl border-b-4 border-white">
                   <h3 className="text-xl font-bold mb-2">{evento.titulo}</h3>
-                  <p className="text-white/80">{evento.descripcion}</p>
-                  <Button variant="outline" className="mt-4 border-white text-white hover:bg-white/10">
+                  <p className="text-white/80 flex-grow">{evento.descripcion}</p>
+                  <Button className="mt-4 bg-white text-purple-600 hover:bg-purple-100 hover:text-purple-700 transition-colors">
                     <Link href={`/eventos/${evento.id}`}>Ver Detalles</Link>
                   </Button>
                 </CardContent>
@@ -106,8 +107,8 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
             {eventosFiltrados.slice(3, 6).map((evento, index) => (
-              <Card key={index} className="overflow-hidden transition-all hover:shadow-lg">
-                <div className="relative h-48">
+              <Card key={index} className="flex-col h-full overflow-hidden border-0 shadow-xl rounded-2xl hover:scale-[1.02] transition-transform duration-300">
+                <div className="relative h-48 w-full overflow-hidden rounded-t-2xl min-h-[200px]">
                   <Image
                     src={evento.bannerUrl || "/placeholder.svg?height=200&width=400"}
                     alt={evento.titulo}
