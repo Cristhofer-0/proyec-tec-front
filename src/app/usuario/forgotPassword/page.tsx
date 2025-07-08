@@ -22,13 +22,14 @@ import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
-import { cambiarPassword } from "@/services/usuarios" // Asegúrate de ajustar la ruta
+import { obtenerUsuarioPorEmail, cambiarPassword } from "@/services/usuarios" // Asegúrate de ajustar la ruta
 
 export default function DirectPasswordResetForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [emailError, setEmailError] = useState("") // 🔴 Nuevo estado
 
   const [formData, setFormData] = useState({
     email: "",
@@ -65,9 +66,26 @@ export default function DirectPasswordResetForm() {
     return "Muy fuerte"
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setIsLoading(true)
+
+  try {
+    if (!formData.email) {
+      toast.error("Debes ingresar tu correo electrónico")
+      setIsLoading(false)
+      return
+    }
+
+    const cleanEmail = formData.email.trim().toLowerCase()
+    console.log("🔍 Buscando usuario con:", cleanEmail)
+
+    const user = await obtenerUsuarioPorEmail(cleanEmail)
+    
+    console.log("✅ Usuario encontrado:", user)
+
+    const userId = user.UserId
+    setEmailError("")
 
     if (!formData.newPassword || !formData.confirmPassword) {
       toast.error("Completa todos los campos de contraseña")
@@ -88,21 +106,24 @@ export default function DirectPasswordResetForm() {
       return
     }
 
-    try {
-      await cambiarPassword({
-        userId: userId.toString(),
-        newPassword: formData.newPassword,
-        requireCurrent: false,
-      })
+    await cambiarPassword({
+      userId: userId.toString(),
+      newPassword: formData.newPassword,
+      requireCurrent: false,
+    })
 
-      toast.success("¡Contraseña restablecida exitosamente!")
-      setIsSuccess(true)
-    } catch (err) {
-      toast.error("Error al restablecer la contraseña")
-    } finally {
-      setIsLoading(false)
-    }
+    toast.success("¡Contraseña restablecida exitosamente!")
+    setIsSuccess(true)
+  } catch (error) {
+    console.error("❌ Error al obtener usuario:", error)
+    setEmailError("Este correo no existe")
+    toast.error("Correo no encontrado")
+  } finally {
+    setIsLoading(false)
   }
+}
+
+
 
   if (isSuccess) {
     return (
@@ -170,15 +191,21 @@ export default function DirectPasswordResetForm() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email (opcional)</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  onChange={(e) => {
+                    handleInputChange("email", e.target.value)
+                    setEmailError("") // 🔄 Limpia el error cuando el usuario edita
+                  }}
                   disabled={isLoading}
                   placeholder="tu@correo.com"
                 />
+                {emailError && (
+                  <p className="text-sm text-red-500">{emailError}</p>
+                )}
               </div>
 
               <Separator />

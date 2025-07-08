@@ -5,6 +5,8 @@ import { CarritoProvider } from '@/components/principales/CarritoContext'; // Aj
 import { NotificationsProvider } from "@/components/principales/NotificationsContext"; // Ajusta la ruta
 import Header from "@/app/utils/header";
 import Footer from "@/app/utils/footer";
+import GsapWrapper from "@/components/principales/GsapWrapper";
+
 
 export const metadata: Metadata = {
   title: "Joint With Us | Los mejores eventos de la comunidad",
@@ -12,22 +14,27 @@ export const metadata: Metadata = {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico"
   },
-  description: "Pagina principal de Joint With Us",
+  description: "Página principal de Joint With Us",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="es">
       <body>
         <NotificationsProvider>
           <CarritoProvider>
             <Header />
+            
+            <main className="min-h-[80vh]">
+              <GsapWrapper>
+                {children}
+              </GsapWrapper>
+            </main>
 
-            {children}
             <Footer />
           </CarritoProvider>
         </NotificationsProvider>

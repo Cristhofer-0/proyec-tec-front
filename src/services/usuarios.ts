@@ -79,7 +79,6 @@ export async function registerUser(data: UsuarioData) {
 }
 
 export async function cambiarPassword(data: CambioPasswordData): Promise<void> {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
   const response = await fetch(`${API_BASE_URL}/usuarios/${data.userId}/cambiar-password`, {
     method: "PUT",
@@ -101,7 +100,6 @@ export async function cambiarPassword(data: CambioPasswordData): Promise<void> {
 }
 
 export async function editarUsuarioPerfil(usuario: UsuarioDataPerfil): Promise<void> {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 
   const response = await fetch(`${API_BASE_URL}/usuarios/${usuario.userId}`, {
     method: "PUT",
@@ -119,4 +117,18 @@ export async function editarUsuarioPerfil(usuario: UsuarioDataPerfil): Promise<v
     console.error("Error en la respuesta de la API:", errorText)
     throw new Error("No se pudo editar el usuario")
   }
+}
+
+export async function obtenerUsuarioPorEmail(email: string) {
+  const url = `${API_BASE_URL}/usuarios/por-email/${encodeURIComponent(email)}`
+  console.log("📡 GET:", url)
+
+  const res = await fetch(url)
+  if (!res.ok) {
+    const text = await res.text()
+    console.error("❌ Backend respondió mal:", text)
+    throw new Error("Usuario no encontrado")
+  }
+  const data = await res.json()
+  return data
 }
