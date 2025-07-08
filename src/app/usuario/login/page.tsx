@@ -158,7 +158,7 @@ export default function Login() {
             </div>
 
             {/* RECORDAR Y OLVIDAR */}
-            
+
 
             <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
               Iniciar sesión
@@ -182,6 +182,11 @@ export default function Login() {
               ¿No tienes una cuenta?{" "}
               <Link href="/usuario/register" className="font-medium text-purple-600 hover:underline">
                 Regístrate
+              </Link>
+            </div>
+            <div className="text-center text-sm">
+              <Link href="/usuario/forgotPassword" className="font-medium text-purple-600 hover:underline">
+                ¿Olvidaste la contraseña?
               </Link>
             </div>
           </CardFooter>

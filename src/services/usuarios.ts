@@ -87,8 +87,9 @@ export async function cambiarPassword(data: CambioPasswordData): Promise<void> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      currentPassword: data.currentPassword,
+      currentPassword: data.currentPassword  || "", 
       newPassword: data.newPassword,
+      requireCurrent: data.requireCurrent ?? true, // ✅ si no se manda, asume true por defecto
     }),
   })
 
