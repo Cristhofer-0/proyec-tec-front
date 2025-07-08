@@ -101,4 +101,4 @@ MIT
 
 ## ✨ Autor
 
-Desarrollado por [Cristhofer](https://github.com/Cristhofer-0) [Miguel](https://github.com/sevenjpg8) [Franco](https://github.com/LuisFr3) [Adrian](https://github.com/SkipCodeBytes)✌️
+Desarrollado por [Cristhofer](https://github.com/Cristhofer-0) [Miguel](https://github.com/sevenjpg8) [Franco](https://github.com/LuisFr3) [Adrian](https://github.com/SkipCodeBytes) [Sebastian](https://github.com/sebaslade)✌️
