@@ -305,7 +305,10 @@ export default function ProfilePage() {
                   </div>
                   <Separator />
                   <div className="flex justify-end">
-                    <Button onClick={handleGuardarCambios}>Guardar cambios</Button>
+                    <Button 
+                      onClick={handleGuardarCambios}
+                      className="text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-200"
+                    >Guardar cambios</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -426,7 +429,11 @@ export default function ProfilePage() {
                                     variant={paginaActual === page ? "default" : "ghost"}
                                     size="sm"
                                     onClick={() => setPaginaActual(page)}
-                                    className="w-8 h-8 p-0"
+                                    className={
+                                      paginaActual === page
+                                        ? "w-8 h-8 p-0 bg-purple-600 text-white hover:bg-purple-700 transition-colors duration-200"
+                                        : "w-8 h-8 p-0 text-gray-700 hover:bg-gray-200 transition-colors duration-200"
+                                    }
                                   >
                                     {page}
                                   </Button>
@@ -488,7 +495,10 @@ export default function ProfilePage() {
                               Realizado el {new Date(item.date).toLocaleDateString()}
                             </p>
                           </div>
-                          <Badge variant={new Date(item.date) < new Date() ? "default" : "outline"}>
+                          <Badge 
+                            variant={new Date(item.date) < new Date() ? "default" : "outline"}
+                            className="text-white bg-purple-600"
+                          >
                             {new Date(item.date) < new Date() ? "Válido" : "No válido"}
                           </Badge>
                         </div>

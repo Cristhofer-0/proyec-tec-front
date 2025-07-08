@@ -198,32 +198,39 @@ export default function AyudaPage() {
                 <div className="max-w-2xl mx-auto mb-12">
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Search className="h-5 w-5 text-gray-400" />
+                            <Search className="h-5 w-5 text-gray-400 " />
                         </div>
                         <Input
                             type="text"
                             placeholder="Buscar en preguntas frecuentes..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10 py-3 text-lg"
+                            className="pl-10 py-3 text-lg bg-white rounded-xl shadow-md"
                         />
                     </div>
                 </div>
 
                 <Tabs defaultValue="faq" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 mb-8">
-                        <TabsTrigger value="faq" className="text-lg py-3">
+                    <TabsList className="grid w-full grid-cols-2 gap-2 mb-8">
+                        <TabsTrigger 
+                            value="faq"
+                            className="btn-purple"
+                        >
                             <HelpCircle className="w-5 h-5 mr-2" />
                             Preguntas Frecuentes
                         </TabsTrigger>
-                        <TabsTrigger value="contact" className="text-lg py-3">
+
+                        <TabsTrigger 
+                            value="contact" 
+                            className="btn-purple"
+                        >
                             <MessageCircle className="w-5 h-5 mr-2" />
                             Contactar Soporte
                         </TabsTrigger>
                     </TabsList>
 
                     {/* FAQ Section */}
-                    <TabsContent value="faq" className="space-y-6">
+                    <TabsContent value="faq" className="space-y-6 ">
                         {/* Category Filter */}
                         <div className="flex flex-wrap gap-2 justify-center mb-8">
                             {faqCategories.map((category) => {
@@ -233,7 +240,12 @@ export default function AyudaPage() {
                                         key={category.id}
                                         variant={selectedCategory === category.id ? "default" : "outline"}
                                         onClick={() => setSelectedCategory(category.id)}
-                                        className="flex items-center gap-2"
+                                        className={
+                                            selectedCategory === category.id
+                                            ? "flex items-center gap-2 bg-purple-600 text-white hover:bg-purple-700"
+                                            : "flex items-center gap-2 bg-white hover:bg-purple-1 transition-colors"
+                                        }
+
                                     >
                                         <Icon className="w-4 h-4" />
                                         {category.name}
@@ -243,12 +255,12 @@ export default function AyudaPage() {
                         </div>
 
                         {/* FAQ Results */}
-                        <Card>
+                        <Card className="bg-white p-6 rounded-xl shadow-md">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
                                     <HelpCircle className="w-6 h-6" />
                                     Preguntas Frecuentes
-                                    <Badge variant="secondary">{filteredFaqs.length} resultados</Badge>
+                                    <Badge variant="secondary" className="text-white bg-purple-600">{filteredFaqs.length} resultados</Badge>
                                 </CardTitle>
                                 <CardDescription>Encuentra respuestas a las preguntas más comunes</CardDescription>
                             </CardHeader>
@@ -257,9 +269,9 @@ export default function AyudaPage() {
                                     <Accordion type="single" collapsible className="w-full">
                                         {filteredFaqs.map((faq, index) => (
                                             <AccordionItem key={index} value={`item-${index}`}>
-                                                <AccordionTrigger className="text-left">
+                                                <AccordionTrigger className="text-left no-underline hover:no-underline focus:no-underline">
                                                     <div className="flex items-start gap-3">
-                                                        <Badge variant="outline" className="mt-1">
+                                                        <Badge variant="outline" className="mt-1 text-white bg-purple-600">
                                                             {faqCategories.find((cat) => cat.id === faq.category)?.name}
                                                         </Badge>
                                                         <span>{faq.question}</span>
@@ -286,7 +298,7 @@ export default function AyudaPage() {
                     <TabsContent value="contact" className="space-y-6">
                         <div className="grid md:grid-cols-2 gap-8">
                             {/* Contact Form */}
-                            <Card>
+                            <Card className="bg-white rounded-xl shadow-md">
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-2">
                                         <MessageCircle className="w-6 h-6" />
@@ -345,7 +357,11 @@ export default function AyudaPage() {
                                     </CardContent>
                                     <br />
                                     <CardFooter>
-                                        <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+                                        <Button 
+                                            type="submit" 
+                                            className="w-full text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-200" 
+                                            size="lg" 
+                                            disabled={isSubmitting}>
                                             <Mail className="w-4 h-4 mr-2" />
                                             {isSubmitting ? "Enviando..." : "Enviar mensaje"}
                                         </Button>
@@ -355,7 +371,7 @@ export default function AyudaPage() {
 
                             {/* Contact Information */}
                             <div className="space-y-6">
-                                <Card>
+                                <Card className="bg-white p-6 rounded-xl shadow-md">
                                     <CardHeader>
                                         <CardTitle className="flex items-center gap-2">
                                             <Phone className="w-6 h-6" />
