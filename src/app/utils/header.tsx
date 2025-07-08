@@ -18,8 +18,10 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useNotifications } from "@/components/principales/NotificationsContext"
+import { useRouter } from "next/navigation"
 
 const Header: React.FC = () => {
+  const router = useRouter()
   const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
@@ -121,9 +123,14 @@ const Header: React.FC = () => {
                         <div key={notificacion.NotificationId}>
                           <DropdownMenuItem
                             className={`flex items-start justify-between gap-3 px-4 py-3 cursor-pointer transition-all rounded-md
-              ${!notificacion.IsRead ? "bg-muted/40 hover:bg-muted" : "hover:bg-accent"}
-            `}
-                            onClick={() => marcarComoLeida(notificacion.NotificationId)}
+                              ${!notificacion.IsRead ? "bg-muted/40 hover:bg-muted" : "hover:bg-accent"}
+                            `}
+                            onClick={() => {
+                              marcarComoLeida(notificacion.NotificationId)
+                              if (notificacion.EventId) {
+                                router.push(`/eventos/${notificacion.EventId}`)
+                              }
+                            }}
                           >
                             <div className="flex-1 space-y-1">
                               <div className="flex items-center gap-2">
