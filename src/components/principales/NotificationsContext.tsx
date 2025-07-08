@@ -33,7 +33,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    const cargarUsuarioYNotificaciones = async () => {
+    const cargarNotificaciones = async () => {
       let userId = user?.id || user?.UserId;
 
       if (!userId) {
@@ -53,14 +53,12 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
       } else {
         console.warn("⚠️ Usuario no definido, no se cargan notificaciones.");
       }
-
-      setInitialized(true);
     };
 
-    if (!initialized) {
-      cargarUsuarioYNotificaciones();
+    if (user) {
+      cargarNotificaciones();
     }
-  }, [initialized]);
+  }, [user]); 
 
   useEffect(() => {
     const userId = user?.UserId || user?.id;
