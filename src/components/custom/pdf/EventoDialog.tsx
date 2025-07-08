@@ -99,6 +99,7 @@ export default function EventoDialog({ id }: { id: string }) {
         </Button> */}
         
         {evento ? (
+          <>
           <PDFDownloadLink
             document={<EventoPDF 
               evento={normalizarEvento(evento)} 
@@ -116,7 +117,7 @@ export default function EventoDialog({ id }: { id: string }) {
                 {loading ? 'Generando PDF...' : 'Descargar PDF'}
               </Button>
             )}
-          </PDFDownloadLink>
+          </PDFDownloadLink></>
         ) : (
           <p className="text-sm text-gray-500">Cargando PDF…</p>
         )}
