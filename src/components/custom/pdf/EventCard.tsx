@@ -109,14 +109,6 @@ function formatearFechaUTC(utcString: string) {
           <p className="text-gray-600 dark:text-gray-400">{evento.Organizer}</p>
         </div>
       )}
-
-      {/* Otros detalles */}
-      <div className="bg-gray-50 dark:bg-zinc-800 p-4 rounded-lg text-sm space-y-1">
-        <p><strong>ID del Evento:</strong> {evento.EventId}</p>
-        {/* <p><strong>Estado:</strong> {evento.Status}</p> */}
-        <p><strong>Capacidad:</strong> {evento.Capacity}</p>
-        {/* <p><strong>Visibilidad:</strong> {evento.Visibility}</p> */}
-      </div>
     </div>
   )
 }
