@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🧪 Proyec-Tec Front
 
-## Getting Started
+Frontend para la plataforma **Proyec-Tec**, desarrollado en **Next.js**, diseñado para ofrecer una experiencia moderna, fluida y en tiempo real a los usuarios que buscan explorar, gestionar y participar en eventos tecnológicos y sociales.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Tecnologías Utilizadas
+
+- [Next.js](https://nextjs.org/) – Framework React para SSR/SSG.
+- [Tailwind CSS](https://tailwindcss.com/) – Utilidades de diseño.
+- [shadcn/ui](https://ui.shadcn.dev/) – Componentes de interfaz de usuario elegantes y reutilizables.
+- [Zustand](https://zustand-demo.pmnd.rs/) – Gestión de estado global.
+- [Socket.IO](https://socket.io/) – Comunicación en tiempo real (notificaciones).
+- [MapLibre GL](https://maplibre.org/) – Renderizado de mapas interactivos.
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+proyec-tec-front/
+├── app/                   # Rutas y páginas Next.js
+├── components/            # Componentes reutilizables
+│   └── principales/       # Carrito, notificaciones, etc.
+├── stores/                # Zustand stores
+├── public/                # Recursos estáticos
+├── lib/                   # Funciones utilitarias y configuración
+├── styles/                # Archivos de estilo global
+└── ...
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📦 Instalación
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Clonar el repositorio
+git clone https://github.com/Cristhofer-0/proyec-tec-front.git
+cd proyec-tec-front
 
-## Learn More
+# Instalar dependencias
+npm install
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🧪 Uso en Desarrollo
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Ejecutar el servidor de desarrollo
+npm run dev
+```
 
-## Deploy on Vercel
+Luego abre en el navegador: [http://localhost:3001](http://localhost:3001)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🌐 Variables de Entorno
+
+Crea un archivo `.env.local` y configura tus variables:
+
+```env
+NEXT_PUBLIC_SOCKET_URL=http://localhost:3000
+```
+
+Asegúrate de que el backend y WebSocket estén en funcionamiento en ese puerto.
+
+---
+
+## 🔔 Funcionalidades Principales
+
+- 🛒 Carrito de compras con persistencia
+- 📬 Notificaciones en tiempo real vía WebSocket
+- 📍 Selección de ubicación con MapLibre
+- 🎫 Sistema de tickets para eventos
+- 🧾 Página de perfil con múltiples secciones
+
+---
+
+## 🧹 Scripts Útiles
+
+```bash
+npm run dev       # Inicia el servidor de desarrollo
+npm run build     # Compila el proyecto para producción
+npm run lint      # Corre ESLint
+```
+
+---
+
+## ✅ Estado
+
+> 🛠️ Proyecto en desarrollo activo. Se conecta con `gestion-front` y `gestion-back`.
+
+---
+
+## 📄 Licencia
+
+MIT
+
+---
+
+## ✨ Autor
+
+Desarrollado por [Cristhofer](https://github.com/Cristhofer-0) [Miguel](https://github.com/sevenjpg8) [Franco](https://github.com/LuisFr3) [Adrian](https://github.com/SkipCodeBytes)✌️
