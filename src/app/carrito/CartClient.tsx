@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Minus, Plus, ShoppingBag, Ticket } from "lucide-react";
+import { CreditCard, Minus, Plus, ShoppingBag, Ticket } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -87,7 +87,7 @@ export default function CartClient() {
   }, [status, router]);
 
   return (
-    <div className="container mx-auto py-12 px-4 min-h-screen">
+    <div className="container mx-auto py-12 px-4">
       <div className="flex items-center gap-2 mb-6">
         <ShoppingBag className="h-6 w-6" />
         <h1 className="text-3xl font-bold">Mi Carrito</h1>
@@ -212,7 +212,9 @@ export default function CartClient() {
               <Button 
                 className="w-full mt-6 text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-200" 
                 onClick={handlePagar}
-              >Proceder al pago</Button>
+              >
+                <CreditCard className="mr-2 h-4 w-4" />
+                Proceder al pago</Button>
               <Button variant="outline" className="w-full mt-2" asChild>
                 <Link href="/eventos">Continuar comprando</Link>
               </Button>
