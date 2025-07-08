@@ -129,12 +129,6 @@ export default function DirectPasswordResetForm() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-4">
         <div className="w-full max-w-md space-y-6">
-          <div className="flex items-center justify-center">
-            <Link href="/" className="flex items-center gap-2">
-              <ArrowUpCircleIcon className="h-8 w-8" />
-              <span className="text-xl font-semibold">Acme Inc.</span>
-            </Link>
-          </div>
 
           <Card>
             <CardHeader className="text-center">
@@ -161,10 +155,6 @@ export default function DirectPasswordResetForm() {
               </Button>
             </CardContent>
           </Card>
-
-          <div className="text-center text-sm text-muted-foreground">
-            <p>© 2024 Acme Inc. Todos los derechos reservados.</p>
-          </div>
         </div>
       </div>
     )
@@ -173,12 +163,6 @@ export default function DirectPasswordResetForm() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
-        <div className="flex items-center justify-center">
-          <Link href="/" className="flex items-center gap-2">
-            <ArrowUpCircleIcon className="h-8 w-8" />
-            <span className="text-xl font-semibold">Acme Inc.</span>
-          </Link>
-        </div>
 
         <Card>
           <CardHeader className="text-center">
@@ -302,10 +286,6 @@ export default function DirectPasswordResetForm() {
             </form>
           </CardContent>
         </Card>
-
-        <div className="text-center text-sm text-muted-foreground">
-          <p>© 2024 Acme Inc. Todos los derechos reservados.</p>
-        </div>
       </div>
     </div>
   )
