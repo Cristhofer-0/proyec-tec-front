@@ -99,7 +99,7 @@ MIT
 
 ---
 
-## ✨ Autor
+## ✨ Autores
 
 Desarrollado por:  
 - [Cristhofer](https://github.com/Cristhofer-0)  
