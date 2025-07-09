@@ -41,15 +41,20 @@ const Header: React.FC = () => {
   } = useNotifications()
 
   useEffect(() => {
-    if (!user) {
-      const stored = localStorage.getItem("user");
-      if (stored) {
-        const userParsed = JSON.parse(stored);
-        console.log("👤 Usuario desde localStorage:", userParsed);
-        setUser(userParsed);
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === "user") {
+        const userData = localStorage.getItem("user");
+        if (userData) {
+          setUser(JSON.parse(userData)); // actualiza tu store o estado
+        } else {
+          setUser(null); // usuario se deslogueó en otra pestaña
+        }
       }
-    }
-  }, []); // ✅ Ejecutar solo una vez al montar
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
 
   useEffect(() => {
