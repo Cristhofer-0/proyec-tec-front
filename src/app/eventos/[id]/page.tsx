@@ -351,14 +351,13 @@ export default function EventoDetalle() {
             </div>
             <h3 className="text-2xl font-semibold text-gray-800 mb-3">Inicie sesión para comprar</h3>
             <p className="text-gray-500 mb-6">Acceda a su cuenta para completar la compra y disfrutar de nuestros productos exclusivos.</p>
-            <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-200">
+            <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition duration-200 cursor-pointer">
               <Link href="/usuario/login">
                 Iniciar Sesión
               </Link>
             </button>
           </div>
         </div>
-
       )}
     </main>
   )

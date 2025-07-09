@@ -8,17 +8,21 @@ export default function GsapWrapper({ children }: { children: React.ReactNode })
   const el = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        el.current,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
-      );
-    });
+  const isStickyPage = pathname.includes("/eventos/"); // o lo que uses
 
-    return () => ctx.revert();
+  useEffect(() => {
+    if (!isStickyPage) {
+      const ctx = gsap.context(() => {
+        gsap.fromTo(
+          el.current,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }
+        );
+      });
+      return () => ctx.revert();
+    }
   }, [pathname]);
+
 
   return (
     <div ref={el}>
