@@ -41,13 +41,16 @@ const Header: React.FC = () => {
   } = useNotifications()
 
   useEffect(() => {
-    const stored = localStorage.getItem("user");
-    if (stored) {
-      const userParsed = JSON.parse(stored);
-      console.log("👤 Usuario desde localStorage:", userParsed);
-      setUser(userParsed);
+    if (!user) {
+      const stored = localStorage.getItem("user");
+      if (stored) {
+        const userParsed = JSON.parse(stored);
+        console.log("👤 Usuario desde localStorage:", userParsed);
+        setUser(userParsed);
+      }
     }
-  }, [setUser]);
+  }, []); // ✅ Ejecutar solo una vez al montar
+
 
   useEffect(() => {
     console.log("🔔 Notificaciones actuales en Header:", notificaciones);

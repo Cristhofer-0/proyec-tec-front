@@ -251,7 +251,7 @@ export default function DirectPasswordResetForm() {
                 <div className="relative">
                   <Input
                     id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
+                    //type={showConfirmPassword ? "text" : "password"}
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                     required
@@ -270,7 +270,7 @@ export default function DirectPasswordResetForm() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full gap-2" disabled={isLoading}>
+              <Button type="submit" className="w-full gap-2 text-white bg-purple-600" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />

@@ -43,7 +43,7 @@ export default function ChangePasswordForm({ userId }: { userId: string }) {
           onChange={(e) => setNewPassword(e.target.value)}
         />
       </div>
-      <Button type="submit" disabled={loading}>
+      <Button type="submit" disabled={loading} className="text-white bg-purple-600">
         {loading ? "Actualizando..." : "Actualizar contraseña"}
       </Button>
     </form>
