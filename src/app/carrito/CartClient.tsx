@@ -158,20 +158,6 @@ export default function CartClient() {
 
                             <div className="flex items-center justify-between mt-2">
                               <div className="flex items-center gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-8 w-8 rounded-full"
-                                  disabled={item.quantity <= 1}
-                                >
-                                  <Minus className="h-4 w-4" />
-                                  <span className="sr-only">Reducir cantidad</span>
-                                </Button>
-                                <span className="w-8 text-center">{item.quantity}</span>
-                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full">
-                                  <Plus className="h-4 w-4" />
-                                  <span className="sr-only">Aumentar cantidad</span>
-                                </Button>
                               </div>
                               <div className="text-right">
                                 <div className="text-sm text-muted-foreground">S/{item.price.toFixed(2)} / ticket</div>

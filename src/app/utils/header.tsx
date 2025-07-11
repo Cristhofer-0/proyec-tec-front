@@ -2,7 +2,7 @@
 
 import type React from "react"
 import Link from "next/link"
-import { Menu, ShoppingCart, User, Bell, X } from "lucide-react"
+import { Menu, ShoppingCart, User, Bell, X, MenuIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useUserStore } from "@/stores/userStore"
@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation"
 const Header: React.FC = () => {
   const router = useRouter()
   const [isClient, setIsClient] = useState(false)
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     setIsClient(true)
@@ -69,14 +70,20 @@ const Header: React.FC = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
-          <Menu className="h-6 w-6 md:hidden" />
           <Link href="/" className="flex items-center gap-2">
+                {/* Botón hamburguesa SOLO visible en mobile */}
+            <div className="md:hidden">
+              <button onClick={() => setOpen(!open)}>
+                <MenuIcon className="h-6 w-6" />
+              </button>
+            </div>
             <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text">
               JoinWithUs!
             </span>
           </Link>
         </div>
 
+        {/* Menú para escritorio */}
         <nav className="hidden md:flex items-center gap-6 text-sm">
           <Link href="/eventos" className="font-medium transition-colors hover:text-primary">
             Eventos
@@ -86,6 +93,15 @@ const Header: React.FC = () => {
             Ayuda
           </Link>
         </nav>
+
+        {/* Menú desplegable en mobile */}
+        {open && (
+          <div className="absolute top-16 left-0 w-full bg-white shadow-md p-4 md:hidden">
+            <Link href="/eventos" className="block py-2">Eventos</Link>
+            <Link href="/solicitud-evento" className="block py-2">Solicitud</Link>
+            <Link href="/ayuda" className="block py-2">Ayuda</Link>
+          </div>
+        )}
 
         <div className="flex items-center gap-4">
           {isClient && user && (
