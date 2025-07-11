@@ -70,13 +70,12 @@ const Header: React.FC = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2">
-                {/* Botón hamburguesa SOLO visible en mobile */}
-            <div className="md:hidden">
+          <div className="md:hidden">
               <button onClick={() => setOpen(!open)}>
                 <MenuIcon className="h-6 w-6" />
               </button>
             </div>
+          <Link href="/" className="flex items-center gap-2">
             <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-500 text-transparent bg-clip-text">
               JoinWithUs!
             </span>
