@@ -1,17 +1,15 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
+import { jwtDecode } from "jwt-decode"
 import {
-  ArrowLeftIcon,
-  ArrowUpCircleIcon,
   CheckCircleIcon,
   CheckIcon,
   EyeIcon,
   EyeOffIcon,
   KeyIcon,
-  MailIcon,
-  ShieldCheckIcon,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -22,23 +20,51 @@ import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import { toast } from "sonner"
-import { obtenerUsuarioPorEmail, cambiarPassword } from "@/services/usuarios" // Asegúrate de ajustar la ruta
+import { cambiarPassword } from "@/services/usuarios" // Ajusta la ruta si es necesario
+
+type DecodedToken = {
+  userId: number
+  exp: number
+}
 
 export default function DirectPasswordResetForm() {
+  const searchParams = useSearchParams()
+  const token = searchParams.get("token")
+
+  const [userId, setUserId] = useState<string | null>(null)
+  const [tokenError, setTokenError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [emailError, setEmailError] = useState("") // 🔴 Nuevo estado
 
   const [formData, setFormData] = useState({
-    email: "",
     newPassword: "",
     confirmPassword: "",
   })
 
-  // 🔧 Aquí debes obtener el userId de donde lo tengas (por ejemplo, desde la URL, store, props, etc.)
-  const userId = 1 // Cambia esto por la fuente real de userId
+  // ✅ Decodificar el token y obtener el userId
+  useEffect(() => {
+    if (!token) {
+      setTokenError("Token no proporcionado")
+      return
+    }
+
+    try {
+      const decoded = jwtDecode<DecodedToken>(token)
+      const now = Date.now() / 1000
+
+      if (decoded.exp < now) {
+        setTokenError("El enlace ha expirado. Solicita uno nuevo.")
+        return
+      }
+
+      setUserId(decoded.userId?.toString())
+    } catch (error) {
+      console.error("Error al decodificar token:", error)
+      setTokenError("Token inválido")
+    }
+  }, [token])
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -66,70 +92,66 @@ export default function DirectPasswordResetForm() {
     return "Muy fuerte"
   }
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setIsLoading(true)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-  try {
-    if (!formData.email) {
-      toast.error("Debes ingresar tu correo electrónico")
-      setIsLoading(false)
+    if (tokenError) {
+      toast.error(tokenError)
       return
     }
 
-    const cleanEmail = formData.email.trim().toLowerCase()
-    console.log("🔍 Buscando usuario con:", cleanEmail)
-
-    const user = await obtenerUsuarioPorEmail(cleanEmail)
-    
-    console.log("✅ Usuario encontrado:", user)
-
-    const userId = user.UserId
-    setEmailError("")
+    if (!userId) {
+      toast.error("No se pudo obtener el usuario. Intenta con otro enlace.")
+      return
+    }
 
     if (!formData.newPassword || !formData.confirmPassword) {
       toast.error("Completa todos los campos de contraseña")
-      setIsLoading(false)
       return
     }
 
     if (formData.newPassword !== formData.confirmPassword) {
       toast.error("Las contraseñas no coinciden")
-      setIsLoading(false)
       return
     }
 
     const unmet = passwordRequirements.filter((r) => !r.met)
     if (unmet.length > 0) {
       toast.error("La contraseña no cumple con los requisitos")
-      setIsLoading(false)
       return
     }
 
-    await cambiarPassword({
-      userId: userId.toString(),
-      newPassword: formData.newPassword,
-      requireCurrent: false,
-    })
+    setIsLoading(true)
 
-    toast.success("¡Contraseña restablecida exitosamente!")
-    setIsSuccess(true)
-  } catch (error) {
-    console.error("❌ Error al obtener usuario:", error)
-    setEmailError("Este correo no existe")
-    toast.error("Correo no encontrado")
-  } finally {
-    setIsLoading(false)
+    try {
+      await cambiarPassword({
+        userId,
+        newPassword: formData.newPassword,
+        requireCurrent: false,
+      })
+
+      toast.success("¡Contraseña restablecida exitosamente!")
+      setIsSuccess(true)
+    } catch (error) {
+      console.error("❌ Error al restablecer contraseña:", error)
+      toast.error("Ocurrió un error al restablecer la contraseña")
+    } finally {
+      setIsLoading(false)
+    }
   }
-}
 
-
+  if (tokenError) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center p-4">
+        <p className="text-red-600 font-semibold">{tokenError}</p>
+      </div>
+    )
+  }
 
   if (isSuccess) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-4">
         <div className="w-full max-w-md space-y-6">
-
           <Card>
             <CardHeader className="text-center">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
@@ -139,14 +161,6 @@ export default function DirectPasswordResetForm() {
               <CardDescription>Ya puedes iniciar sesión con tu nueva contraseña.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="rounded-lg bg-muted/50 p-4 text-center">
-                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-2">
-                  <MailIcon className="h-4 w-4" />
-                  <span>Correo:</span>
-                </div>
-                <p className="font-medium">{formData.email}</p>
-              </div>
-
               <Button className="w-full gap-2" asChild>
                 <Link href="/usuario/login">
                   <KeyIcon className="h-4 w-4" />
@@ -163,7 +177,6 @@ export default function DirectPasswordResetForm() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
-
         <Card>
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
@@ -174,24 +187,6 @@ export default function DirectPasswordResetForm() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => {
-                    handleInputChange("email", e.target.value)
-                    setEmailError("") // 🔄 Limpia el error cuando el usuario edita
-                  }}
-                  disabled={isLoading}
-                  placeholder="tu@correo.com"
-                />
-                {emailError && (
-                  <p className="text-sm text-red-500">{emailError}</p>
-                )}
-              </div>
-
               <Separator />
 
               <div className="space-y-2">
@@ -232,8 +227,7 @@ export default function DirectPasswordResetForm() {
                     {passwordRequirements.map((req, i) => (
                       <div key={i} className="flex items-center gap-2 text-sm">
                         <div
-                          className={`flex h-4 w-4 items-center justify-center rounded-full ${req.met ? "bg-green-500" : "bg-muted"
-                            }`}
+                          className={`flex h-4 w-4 items-center justify-center rounded-full ${req.met ? "bg-green-500" : "bg-muted"}`}
                         >
                           {req.met && <CheckIcon className="h-3 w-3 text-white" />}
                         </div>
@@ -251,7 +245,7 @@ export default function DirectPasswordResetForm() {
                 <div className="relative">
                   <Input
                     id="confirmPassword"
-                    //type={showConfirmPassword ? "text" : "password"}
+                    type={showConfirmPassword ? "text" : "password"}
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                     required

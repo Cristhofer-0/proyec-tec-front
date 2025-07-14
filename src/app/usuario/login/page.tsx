@@ -46,7 +46,10 @@ export default function Login() {
   // Verificar sesión activa al montar el componente
   useEffect(() => {
     async function verificarAutenticacion() {
+      
       const data = await validarSesion();
+      console.log("Datos de sesión:", data);
+      console.log("Usuario:", data?.user);
 
       if (data?.user) {
         setUser(data.user);
@@ -89,9 +92,9 @@ export default function Login() {
   if (loading) {
     // Puedes poner un spinner o mensaje mientras verifica la sesión
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f5f8fb]">
-        <p className="text-gray-500">Verificando sesión...</p>
-      </div>
+      <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
+          </div>
     );
   }
 
@@ -160,20 +163,16 @@ export default function Login() {
                 <p className="text-sm text-red-600">{errorServidor}</p>
               )}
             </div>
-
             {/* RECORDAR Y OLVIDAR */}
-
-
             <Button
               type="submit"
               className="w-full bg-purple-600 hover:bg-purple-700"
               disabled={cargandoLogin}
             >
               {cargandoLogin ? (
-                <div className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Cargando...
-                </div>
+                <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
+          </div>
               ) : (
                 <>
                   Iniciar sesión

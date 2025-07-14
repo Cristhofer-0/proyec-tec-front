@@ -8,6 +8,7 @@ export async function validarSesion(): Promise<{ user?: any } | null> {
   try {
     const res = await fetch(`${API_BASE_URL}/usuarios/validar`, {
       credentials: "include",
+      method: "GET",
     });
 
     if (!res.ok) return null;

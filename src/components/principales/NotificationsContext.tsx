@@ -1,10 +1,16 @@
 "use client";
-import { createContext, useContext, useEffect, useState } from "react";
-import { obtenerNotificacionesDB, marcarNotificacionLeidaDB, marcarTodasNotificacionesLeidasDB, eliminarNotificacionDB } from "@/services/notificaciones";
-import { useUserStore } from "@/stores/userStore";
-import { socket } from "@/lib/socket"; // ✅ Usamos el socket compartido
 
-// Tipos
+import { createContext, useContext, useEffect, useState } from "react";
+import {
+  obtenerNotificacionesDB,
+  marcarNotificacionLeidaDB,
+  marcarTodasNotificacionesLeidasDB,
+  eliminarNotificacionDB,
+} from "@/services/notificaciones";
+import { validarSesion } from "@/services/usuarios";
+import { useUserStore } from "@/stores/userStore";
+import { socket } from "@/lib/socket";
+
 interface Notification {
   NotificationId: number;
   UserId: number;
@@ -30,59 +36,85 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
   const [notificaciones, setNotificaciones] = useState<Notification[]>([]);
-  const [initialized, setInitialized] = useState(false);
+  const [cargando, setCargando] = useState(true);
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
-    const cargarNotificaciones = async () => {
-      let userId = user?.id || user?.UserId;
+    setHasMounted(true);
+  }, []);
 
-      if (!userId) {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          console.log("👤 Usuario cargado desde localStorage:", parsedUser);
-          setUser(parsedUser);
-          userId = parsedUser.UserId || parsedUser.id;
+  useEffect(() => {
+    const checkSession = async () => {
+      const tieneTokenUsuario = () => {
+        if (typeof document === "undefined") return false;
+        return document.cookie
+          .split("; ")
+          .some((cookie) => cookie.startsWith("tokenUsuario="));
+      };
+
+      if (!user && tieneTokenUsuario()) {
+        console.log("🔍 Detectando tokenUsuario en cookies...");
+        const result = await validarSesion();
+
+        if (result?.user) {
+          console.log("✅ Usuario validado desde API:", result.user);
+          setUser(result.user);
+        } else {
+          console.log("⚠️ Token inválido o sesión caducada.");
         }
       }
+    };
 
-      if (userId) {
-        const notis = await obtenerNotificacionesDB(userId.toString());
-        setNotificaciones(notis);
-        localStorage.setItem("notificaciones", JSON.stringify(notis));
-      } else {
-        console.warn("⚠️ Usuario no definido, no se cargan notificaciones.");
+    checkSession();
+  }, [user, setUser]);
+
+  useEffect(() => {
+    const initNotifications = async () => {
+      if (!user) {
+        console.log("⚠️ No hay usuario autenticado. No se cargan notificaciones.");
+        setCargando(false);
+        return;
+      }
+
+      const userId = user.UserId ?? user.id;
+
+      if (!userId) {
+        console.warn("⚠️ Usuario no tiene UserId ni id:", user);
+        setCargando(false);
+        return;
+      }
+
+      const notis = await obtenerNotificacionesDB(userId.toString());
+      setNotificaciones(notis);
+      localStorage.setItem("notificaciones", JSON.stringify(notis));
+      setCargando(false);
+
+      if (!socketConnected) {
+        console.log("🔧 Conectando socket para userId:", userId);
+        socket.emit("joinRoom", userId);
+
+        const handleNuevaNotificacion = (nuevaNoti: Notification) => {
+          console.log("🔔 Notificación recibida en tiempo real:", nuevaNoti);
+          setNotificaciones((prev) => {
+            const actualizadas = [nuevaNoti, ...prev];
+            localStorage.setItem("notificaciones", JSON.stringify(actualizadas));
+            return actualizadas;
+          });
+        };
+
+        socket.on("nuevaNotificacion", handleNuevaNotificacion);
+
+        setSocketConnected(true);
+
+        return () => {
+          socket.off("nuevaNotificacion", handleNuevaNotificacion);
+        };
       }
     };
 
-    if (user) {
-      cargarNotificaciones();
-    }
-  }, [user]); 
-
-  useEffect(() => {
-    const userId = user?.UserId || user?.id;
-    if (!userId) return;
-
-    console.log("🔧 Socket conectado para userId:", userId);
-
-    socket.emit("joinRoom", userId);
-
-    const handleNuevaNotificacion = (nuevaNoti: Notification) => {
-      console.log("🔔 Notificación en tiempo real:", nuevaNoti);
-      setNotificaciones((prev) => {
-        const actualizadas = [nuevaNoti, ...prev];
-        localStorage.setItem("notificaciones", JSON.stringify(actualizadas));
-        return actualizadas;
-      });
-    };
-
-    socket.on("nuevaNotificacion", handleNuevaNotificacion);
-
-    return () => {
-      socket.off("nuevaNotificacion", handleNuevaNotificacion);
-    };
-  }, [user]);
+    initNotifications();
+  }, [user, socketConnected]);
 
   const notificacionesNoLeidas = notificaciones.filter((n) => !n.IsRead).length;
 
@@ -102,7 +134,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
   };
 
   const marcarTodasComoLeidas = async () => {
-    const userId = user?.UserId || user?.id;
+    const userId = user?.UserId ?? user?.id;
     if (!userId) return;
 
     const ok = await marcarTodasNotificacionesLeidasDB(userId);
@@ -122,6 +154,10 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     }
   };
 
+  if (!hasMounted) {
+    return null;
+  }
+
   return (
     <NotificationsContext.Provider
       value={{
@@ -133,7 +169,13 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
         setNotificaciones,
       }}
     >
-      {children}
+      {cargando ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
+        </div>
+      ) : (
+        children
+      )}
     </NotificationsContext.Provider>
   );
 }
