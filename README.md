@@ -1,6 +1,10 @@
 # 🧪 Proyec-Tec Front
 
-Frontend para la plataforma **Proyec-Tec**, desarrollado en **Next.js**, diseñado para ofrecer una experiencia moderna, fluida y en tiempo real a los usuarios que buscan explorar, gestionar y participar en eventos tecnológicos y sociales.
+Frontend para la plataforma **JoinWithUs**, desarrollado en **Next.js**, diseñado para ofrecer una experiencia moderna, fluida y en tiempo real a los usuarios que buscan explorar, gestionar y participar en eventos tecnológicos y sociales.
+
+<p align="center">
+  <img src="https://i.imgur.com/Bf9Y16B.png" alt="JoinWithUs Logo" width="300"/>
+</p>
 
 ---
 
