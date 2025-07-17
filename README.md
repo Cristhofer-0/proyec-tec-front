@@ -96,9 +96,11 @@ npm run lint      # Corre ESLint
 ## 📄 Licencia
 
 Este proyecto es de uso privado.  
-**Queda estrictamente prohibida** la copia, distribución, modificación o reutilización parcial o total de este código sin autorización previa y por escrito de los autores.
+**Está permitido su uso únicamente con fines de exhibición en portafolios personales por parte de sus autores.**  
+Queda prohibida su copia, distribución o modificación sin autorización escrita.
 
 © 2025 Cristhofer, Miguel, Franco, Adrian y Sebastian. Todos los derechos reservados.
+
 
 ---
 
